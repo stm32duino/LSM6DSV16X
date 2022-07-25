@@ -25,8 +25,8 @@ Set_X_FS	KEYWORD2
 Get_X_AxesRaw	KEYWORD2
 Get_X_Axes	KEYWORD2
 Get_X_DRDY_Status	KEYWORD2
-Set_X_Power_Mode KEYWORD2
-Set_X_Filter_Mode KEYWORD2
+Set_X_Power_Mode 	KEYWORD2
+Set_X_Filter_Mode 	KEYWORD2
 Enable_G	KEYWORD2
 Disable_G	KEYWORD2
 Get_G_Sensitivity	KEYWORD2
@@ -37,8 +37,8 @@ Set_G_FS	KEYWORD2
 Get_G_AxesRaw	KEYWORD2
 Get_G_Axes	KEYWORD2
 Get_G_DRDY_Status	KEYWORD2
-Set_G_Power_Mode KEYWORD2
-Set_G_Filter_Mode KEYWORD2
+Set_G_Power_Mode 	KEYWORD2
+Set_G_Filter_Mode 	KEYWORD2
 Read_Reg	KEYWORD2
 Write_Reg	KEYWORD2
 
