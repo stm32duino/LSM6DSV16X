@@ -1,0 +1,50 @@
+#######################################
+# Syntax Coloring Map For LSM6DSV16X
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LSM6DSV16XSensor	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+end	KEYWORD2
+ReadID	KEYWORD2
+Enable_X	KEYWORD2
+Disable_X	KEYWORD2
+Get_X_Sensitivity	KEYWORD2
+Get_X_ODR	KEYWORD2
+Set_X_ODR	KEYWORD2
+Get_X_FS	KEYWORD2
+Set_X_FS	KEYWORD2
+Get_X_AxesRaw	KEYWORD2
+Get_X_Axes	KEYWORD2
+Get_X_DRDY_Status	KEYWORD2
+Set_X_Power_Mode KEYWORD2
+Set_X_Filter_Mode KEYWORD2
+Enable_G	KEYWORD2
+Disable_G	KEYWORD2
+Get_G_Sensitivity	KEYWORD2
+Get_G_ODR	KEYWORD2
+Set_G_ODR	KEYWORD2
+Get_G_FS	KEYWORD2
+Set_G_FS	KEYWORD2
+Get_G_AxesRaw	KEYWORD2
+Get_G_Axes	KEYWORD2
+Get_G_DRDY_Status	KEYWORD2
+Set_G_Power_Mode KEYWORD2
+Set_G_Filter_Mode KEYWORD2
+Read_Reg	KEYWORD2
+Write_Reg	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+LSM6DSV16X_OK	LITERAL1
+LSM6DSV16X_ERROR	LITERAL1
