@@ -78,6 +78,12 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(SPIClass *spi, int cs_pin, uint32_t spi_speed
  */
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin()
 {
+  if (dev_spi) {
+    // Configure CS pin
+    pinMode(cs_pin, OUTPUT);
+    digitalWrite(cs_pin, HIGH);
+  }
+
   /* Enable register address automatically incremented during a multiple byte
   access with a serial interface. */
   if (lsm6dsv16x_auto_increment_set(&reg_ctx, PROPERTY_ENABLE) != LSM6DSV16X_OK) {
