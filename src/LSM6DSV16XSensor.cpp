@@ -606,6 +606,116 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_X_DRDY_Status(uint8_t *Status)
 }
 
 /**
+ * @brief  Get the status of all hardware events
+ * @param  Status the status of all hardware events
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_X_Event_Status(LSM6DSV16X_Event_Status_t *Status)
+{
+  lsm6dsv16x_emb_func_status_t emb_func_status;
+  lsm6dsv16x_wake_up_src_t wake_up_src;
+  lsm6dsv16x_tap_src_t tap_src;
+  lsm6dsv16x_d6d_src_t d6d_src;
+  lsm6dsv16x_emb_func_src_t func_src;
+  lsm6dsv16x_md1_cfg_t md1_cfg;
+  lsm6dsv16x_md2_cfg_t md2_cfg;
+  lsm6dsv16x_emb_func_int1_t int1_ctrl;
+  lsm6dsv16x_emb_func_int2_t int2_ctrl;
+
+
+  (void)memset((void *)Status, 0x0, sizeof(LSM6DSV16X_Event_Status_t));
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_WAKE_UP_SRC, (uint8_t *)&wake_up_src, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_SRC, (uint8_t *)&tap_src, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_D6D_SRC, (uint8_t *)&d6d_src, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_SRC, (uint8_t *)&func_src, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&int1_ctrl, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&int2_ctrl, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_STATUS, (uint8_t *)&emb_func_status, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != 0) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&md1_cfg, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&md2_cfg, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+
+  if ((md1_cfg.int1_ff == 1U) || (md2_cfg.int2_ff == 1U)) {
+    if (wake_up_src.ff_ia == 1U) {
+      Status->FreeFallStatus = 1;
+    }
+  }
+
+  if ((md1_cfg.int1_wu == 1U) || (md2_cfg.int2_wu == 1U)) {
+    if (wake_up_src.wu_ia == 1U) {
+      Status->WakeUpStatus = 1;
+    }
+  }
+
+  if ((md1_cfg.int1_single_tap == 1U) || (md2_cfg.int2_single_tap == 1U)) {
+    if (tap_src.single_tap == 1U) {
+      Status->TapStatus = 1;
+    }
+  }
+
+  if ((md1_cfg.int1_double_tap == 1U) || (md2_cfg.int2_double_tap == 1U)) {
+    if (tap_src.double_tap == 1U) {
+      Status->DoubleTapStatus = 1;
+    }
+  }
+
+  if ((md1_cfg.int1_6d == 1U) || (md2_cfg.int2_6d == 1U)) {
+    if (d6d_src.d6d_ia == 1U) {
+      Status->D6DOrientationStatus = 1;
+    }
+  }
+
+  if (int1_ctrl.int1_step_detector == 1U || int2_ctrl.int2_step_detector == 1U) {
+    if (func_src.step_detected == 1U) {
+      Status->StepStatus = 1;
+    }
+  }
+
+  if ((int1_ctrl.int1_tilt == 1U) || (int2_ctrl.int2_tilt == 1U)) {
+    if (emb_func_status.is_tilt == 1U) {
+      Status->TiltStatus = 1;
+    }
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
  * @brief  Set the LSM6DSV16X accelerometer power mode
  * @param  PowerMode Value of the powerMode
  * @retval 0 in case of success, an error code otherwise
@@ -648,6 +758,1553 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_X_Filter_Mode(uint8_t LowHighPassF
   }
   return LSM6DSV16X_OK;
 }
+
+/**
+ * @brief  Enable 6D orientation detection
+ * @param  IntPin interrupt pin line to be used
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_6D_Orientation(LSM6DSV16X_SensorIntPin_t IntPin)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_functions_enable_t functions_enable;
+
+  /* Output Data Rate selection */
+  if (Set_X_ODR(480.0f) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Full scale selection */
+  if (Set_X_FS(2) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* 6D orientation enabled. */
+  if (Set_6D_Orientation_Threshold(2) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+  /* Enable 6D orientation event on either INT1 or INT2 pin */
+  switch (IntPin) {
+    case LSM6DSV16X_INT1_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val1.int1_6d = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    case LSM6DSV16X_INT2_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val2.int2_6d = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+ * @brief  Disable 6D orientation detection
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_6D_Orientation()
+{
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+
+  /* Reset threshold */
+  if (Set_6D_Orientation_Threshold(0) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Disable 6D orientation event on both INT1 and INT2 pins */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val1.int1_6d = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val2.int2_6d = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Set 6D orientation threshold
+ * @param  Threshold 6D Orientation detection threshold
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_6D_Orientation_Threshold(uint8_t Threshold)
+{
+  int32_t ret = LSM6DSV16X_OK;
+  lsm6dsv16x_6d_threshold_t newThreshold = LSM6DSV16X_DEG_80;
+
+  switch (Threshold) {
+    case 0:
+      newThreshold = LSM6DSV16X_DEG_80;
+      break;
+    case 1:
+      newThreshold = LSM6DSV16X_DEG_70;
+      break;
+    case 2:
+      newThreshold = LSM6DSV16X_DEG_60;
+      break;
+    case 3:
+      newThreshold = LSM6DSV16X_DEG_50;
+      break;
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  if (ret == LSM6DSV16X_ERROR) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_6d_threshold_set(&reg_ctx, newThreshold) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+
+}
+
+/**
+ * @brief  Get the status of XLow orientation
+ * @param  XLow the status of XLow orientation
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_6D_Orientation_XL(uint8_t *XLow)
+{
+  lsm6dsv16x_d6d_src_t data;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_D6D_SRC, (uint8_t *)&data, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *XLow = data.xl;
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get the status of XHigh orientation
+ * @param  XHigh the status of XHigh orientation
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_6D_Orientation_XH(uint8_t *XHigh)
+{
+  lsm6dsv16x_d6d_src_t data;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_D6D_SRC, (uint8_t *)&data, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *XHigh = data.xh;
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get the status of YLow orientation
+ * @param  YLow the status of YLow orientation
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_6D_Orientation_YL(uint8_t *YLow)
+{
+  lsm6dsv16x_d6d_src_t data;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_D6D_SRC, (uint8_t *)&data, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *YLow = data.yl;
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get the status of YHigh orientation
+ * @param  YHigh the status of YHigh orientation
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_6D_Orientation_YH(uint8_t *YHigh)
+{
+  lsm6dsv16x_d6d_src_t data;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_D6D_SRC, (uint8_t *)&data, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *YHigh = data.yh;
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get the status of ZLow orientation
+ * @param  ZLow the status of ZLow orientation
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_6D_Orientation_ZL(uint8_t *ZLow)
+{
+  lsm6dsv16x_d6d_src_t data;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_D6D_SRC, (uint8_t *)&data, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *ZLow = data.zl;
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get the status of ZHigh orientation
+ * @param  ZHigh the status of ZHigh orientation
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_6D_Orientation_ZH(uint8_t *ZHigh)
+{
+  lsm6dsv16x_d6d_src_t data;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_D6D_SRC, (uint8_t *)&data, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *ZHigh = data.zh;
+
+  return LSM6DSV16X_OK;
+}
+
+
+/**
+ * @brief  Enable free fall detection
+ * @param  IntPin interrupt pin line to be used
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Free_Fall_Detection(LSM6DSV16X_SensorIntPin_t IntPin)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_functions_enable_t functions_enable;
+
+  /* Output Data Rate selection */
+  if (Set_X_ODR(480) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Full scale selection */
+  if (Set_X_FS(2) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /*  Set free fall duration.*/
+  if (Set_Free_Fall_Duration(3) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set free fall threshold. */
+  if (Set_Free_Fall_Threshold(3) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable free fall event on either INT1 or INT2 pin */
+  switch (IntPin) {
+    case LSM6DSV16X_INT1_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val1.int1_ff = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    case LSM6DSV16X_INT2_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val2.int2_ff = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+ * @brief  Disable free fall detection
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Free_Fall_Detection()
+{
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+
+  /* Disable free fall event on both INT1 and INT2 pins */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val1.int1_ff = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val2.int2_ff = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset free fall threshold. */
+  if (Set_Free_Fall_Threshold(0) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset free fall duration */
+  if (Set_Free_Fall_Duration(0) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Set free fall threshold
+ * @param  Threshold free fall detection threshold
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Free_Fall_Threshold(uint8_t Threshold)
+{
+  lsm6dsv16x_ff_thresholds_t val;
+  switch (Threshold) {
+    case LSM6DSV16X_156_mg:
+      val = LSM6DSV16X_156_mg;
+      break;
+
+    case LSM6DSV16X_219_mg:
+      val = LSM6DSV16X_219_mg;
+      break;
+
+    case LSM6DSV16X_250_mg:
+      val = LSM6DSV16X_250_mg;
+      break;
+
+    case LSM6DSV16X_312_mg:
+      val = LSM6DSV16X_312_mg;
+      break;
+
+    case LSM6DSV16X_344_mg:
+      val = LSM6DSV16X_344_mg;
+      break;
+
+    case LSM6DSV16X_406_mg:
+      val = LSM6DSV16X_406_mg;
+      break;
+
+    case LSM6DSV16X_469_mg:
+      val = LSM6DSV16X_469_mg;
+      break;
+
+    case LSM6DSV16X_500_mg:
+      val = LSM6DSV16X_500_mg;
+      break;
+
+    default:
+      val = LSM6DSV16X_156_mg;
+      break;
+  }
+
+  /* Set free fall threshold. */
+  if (lsm6dsv16x_ff_thresholds_set(&reg_ctx, val) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+
+/**
+ * @brief  Set free fall duration
+ * @param  Duration free fall detection duration
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Free_Fall_Duration(uint8_t Duration)
+{
+  if (lsm6dsv16x_ff_time_windows_set(&reg_ctx, Duration) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Enable wake up detection
+ * @param  IntPin interrupt pin line to be used
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Wake_Up_Detection(LSM6DSV16X_SensorIntPin_t IntPin)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_functions_enable_t functions_enable;
+
+  /* Output Data Rate selection */
+  if (Set_X_ODR(480) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Full scale selection */
+  if (Set_X_FS(2) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set wake-up threshold */
+  if (Set_Wake_Up_Threshold(63) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set wake-up durantion */
+  if (Set_Wake_Up_Duration(0) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable wake up event on either INT1 or INT2 pin */
+  switch (IntPin) {
+    case LSM6DSV16X_INT1_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val1.int1_wu = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    case LSM6DSV16X_INT2_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val2.int2_wu = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  return ret;
+}
+
+
+/**
+ * @brief  Disable wake up detection
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Wake_Up_Detection()
+{
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+
+  /* Disable wake up event on both INT1 and INT2 pins */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val1.int1_wu = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val2.int2_wu = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset wake-up threshold */
+  if (Set_Wake_Up_Threshold(0) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset wake-up durantion */
+  if (Set_Wake_Up_Duration(0) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Set wake up threshold
+ * @param  Threshold wake up detection threshold
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Wake_Up_Threshold(uint32_t Threshold)
+{
+  lsm6dsv16x_act_thresholds_t wake_up_ths;
+
+  if (lsm6dsv16x_act_thresholds_get(&reg_ctx, &wake_up_ths) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  wake_up_ths.wk_ths_mg = Threshold;
+
+  if (lsm6dsv16x_act_thresholds_set(&reg_ctx, wake_up_ths) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Set wake up duration
+ * @param  Duration wake up detection duration
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Wake_Up_Duration(uint8_t Duration)
+{
+  lsm6dsv16x_act_wkup_time_windows_t dur_t;
+
+  if (lsm6dsv16x_act_wkup_time_windows_get(&reg_ctx, &dur_t) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  dur_t.shock = Duration;
+
+  if (lsm6dsv16x_act_wkup_time_windows_set(&reg_ctx, dur_t) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Enable single tap detection
+ * @param  IntPin interrupt pin line to be used
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Single_Tap_Detection(LSM6DSV16X_SensorIntPin_t IntPin)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_functions_enable_t functions_enable;
+
+  lsm6dsv16x_int_dur2_t tap_dur;
+  lsm6dsv16x_tap_cfg0_t tap_cfg0;
+  lsm6dsv16x_tap_ths_6d_t tap_ths_6d;
+
+  /* Output Data Rate selection */
+  if (Set_X_ODR(480) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Full scale selection */
+  if (Set_X_FS(8) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable tap detection on Z-axis. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_cfg0.tap_z_en = 0x01U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set Z-axis threshold. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_ths_6d.tap_ths_z = 0x2U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set quiet and shock time windows. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_dur.quiet = (uint8_t)0x02U;
+  tap_dur.shock = (uint8_t)0x01U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set tap mode. */
+  if (lsm6dsv16x_tap_mode_set(&reg_ctx, LSM6DSV16X_ONLY_SINGLE) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable single tap event on either INT1 or INT2 pin */
+  switch (IntPin) {
+    case LSM6DSV16X_INT1_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val1.int1_single_tap = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    case LSM6DSV16X_INT2_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val2.int2_single_tap = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+ * @brief  Disable single tap detection
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Single_Tap_Detection()
+{
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_int_dur2_t tap_dur;
+  lsm6dsv16x_tap_cfg0_t tap_cfg0;
+  lsm6dsv16x_tap_ths_6d_t tap_ths_6d;
+
+
+  /* Disable single tap event on both INT1 and INT2 pins */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val1.int1_single_tap = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val2.int2_single_tap = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Disable tap detection on Z-axis. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_cfg0.tap_z_en = 0x0U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset Z-axis threshold. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_ths_6d.tap_ths_z = 0x0U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset quiet and shock time windows. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_dur.quiet = (uint8_t)0x0U;
+  tap_dur.shock = (uint8_t)0x0U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Enable double tap detection
+ * @param  IntPin interrupt pin line to be used
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Double_Tap_Detection(LSM6DSV16X_SensorIntPin_t IntPin)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_functions_enable_t functions_enable;
+
+  lsm6dsv16x_int_dur2_t tap_dur;
+  lsm6dsv16x_tap_cfg0_t tap_cfg0;
+  lsm6dsv16x_tap_ths_6d_t tap_ths_6d;
+
+
+  /* Enable tap detection on Z-axis. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_cfg0.tap_z_en = 0x01U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set Z-axis threshold. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_ths_6d.tap_ths_z = 0x03U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set quiet shock and duration. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_dur.dur = (uint8_t)0x03U;
+  tap_dur.quiet = (uint8_t)0x02U;
+  tap_dur.shock = (uint8_t)0x02U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set tap mode. */
+  if (lsm6dsv16x_tap_mode_set(&reg_ctx, LSM6DSV16X_BOTH_SINGLE_DOUBLE) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Output Data Rate selection */
+  if (Set_X_ODR(480) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Full scale selection */
+  if (Set_X_FS(8) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable double tap event on either INT1 or INT2 pin */
+  switch (IntPin) {
+    case LSM6DSV16X_INT1_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val1.int1_double_tap = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    case LSM6DSV16X_INT2_PIN:
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val2.int2_double_tap = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      functions_enable.interrupts_enable = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_FUNCTIONS_ENABLE, (uint8_t *)&functions_enable, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+ * @brief  Disable double tap detection
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Double_Tap_Detection()
+{
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+
+  lsm6dsv16x_int_dur2_t tap_dur;
+  lsm6dsv16x_tap_cfg0_t tap_cfg0;
+  lsm6dsv16x_tap_ths_6d_t tap_ths_6d;
+
+  /* Disable double tap event on both INT1 and INT2 pins */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val1.int1_ff = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val2.int2_ff = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Disable tap detection on Z-axis. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_cfg0.tap_z_en = 0x0U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_cfg0, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset Z-axis threshold. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_ths_6d.tap_ths_z = 0x0U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset quiet shock and duratio. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_dur.dur = (uint8_t)0x0U;
+  tap_dur.quiet = (uint8_t)0x0U;
+  tap_dur.shock = (uint8_t)0x0U;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Set tap mode. */
+  if (lsm6dsv16x_tap_mode_set(&reg_ctx, LSM6DSV16X_ONLY_SINGLE) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Set tap threshold
+ * @param  Threshold tap threshold
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Tap_Threshold(uint8_t Threshold)
+{
+  lsm6dsv16x_tap_ths_6d_t tap_ths_6d;
+
+  /* Set Z-axis threshold */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_ths_6d.tap_ths_z = Threshold;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Set tap shock time
+ * @param  Time tap shock time
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Tap_Shock_Time(uint8_t Time)
+{
+  lsm6dsv16x_int_dur2_t tap_dur;
+
+  /* Set shock time */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_dur.shock = Time;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+}
+
+/**
+ * @brief  Set tap quiet time
+ * @param  Time tap quiet time
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Tap_Quiet_Time(uint8_t Time)
+{
+  lsm6dsv16x_int_dur2_t tap_dur;
+
+  /* Set quiet time */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_dur.quiet = Time;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Set tap duration time
+ * @param  Time tap duration time
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Tap_Duration_Time(uint8_t Time)
+{
+  lsm6dsv16x_int_dur2_t tap_dur;
+
+  /* Set duration time */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  tap_dur.dur = Time;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT_DUR2, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Enable pedometer
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Pedometer(LSM6DSV16X_SensorIntPin_t IntPin)
+{
+  lsm6dsv16x_stpcnt_mode_t mode;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_emb_func_int1_t emb_func_int1;
+  lsm6dsv16x_emb_func_int2_t emb_func_int2;
+
+  /* Output Data Rate selection */
+  if (Set_X_ODR(30) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Full scale selection */
+  if (Set_X_FS(2) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_stpcnt_mode_get(&reg_ctx, &mode) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable pedometer algorithm. */
+  mode.step_counter_enable = PROPERTY_ENABLE;
+  mode.false_step_rej = PROPERTY_DISABLE;
+
+  /* Turn on embedded features */
+  if (lsm6dsv16x_stpcnt_mode_set(&reg_ctx, mode) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable free fall event on either INT1 or INT2 pin */
+  switch (IntPin) {
+    case LSM6DSV16X_INT1_PIN:
+      /* Enable access to embedded functions registers. */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Step detector interrupt driven to INT1 pin */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      emb_func_int1.int1_step_detector = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Disable access to embedded functions registers */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val1.int1_emb_func = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    case LSM6DSV16X_INT2_PIN:
+      /* Enable access to embedded functions registers. */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Step detector interrupt driven to INT1 pin */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      emb_func_int2.int2_step_detector = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Disable access to embedded functions registers */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val2.int2_emb_func = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    default:
+      return LSM6DSV16X_ERROR;
+      break;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+
+/**
+ * @brief  Disable pedometer
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Pedometer()
+{
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+
+  lsm6dsv16x_emb_func_int1_t emb_func_int1;
+  lsm6dsv16x_emb_func_int2_t emb_func_int2;
+
+  lsm6dsv16x_stpcnt_mode_t mode;
+
+
+  if (lsm6dsv16x_stpcnt_mode_get(&reg_ctx, &mode) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable pedometer algorithm. */
+  mode.step_counter_enable = PROPERTY_DISABLE;
+  mode.false_step_rej = PROPERTY_DISABLE;
+
+  /* Turn off embedded features */
+  if (lsm6dsv16x_stpcnt_mode_set(&reg_ctx, mode) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Disable emb func event on either INT1 or INT2 pin */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val1.int1_emb_func = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val2.int2_emb_func = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable access to embedded functions registers. */
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset interrupt driven to INT1 pin. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  emb_func_int1.int1_step_detector = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset interrupt driven to INT2 pin. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  emb_func_int2.int2_step_detector = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Disable access to embedded functions registers. */
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get step count
+ * @param  StepCount step counter
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_Step_Count(uint16_t *StepCount)
+{
+  if (lsm6dsv16x_stpcnt_steps_get(&reg_ctx, StepCount) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Enable step counter reset
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Step_Counter_Reset()
+{
+  if (lsm6dsv16x_stpcnt_rst_step_set(&reg_ctx, PROPERTY_ENABLE) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Enable tilt detection
+ * @param  IntPin interrupt pin line to be used
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Tilt_Detection(LSM6DSV16X_SensorIntPin_t IntPin)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+  lsm6dsv16x_emb_func_en_a_t emb_func_en_a;
+  lsm6dsv16x_emb_func_int1_t emb_func_int1;
+  lsm6dsv16x_emb_func_int2_t emb_func_int2;
+
+  /* Output Data Rate selection */
+  if (Set_X_ODR(30) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Full scale selection */
+  if (Set_X_FS(2) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  switch (IntPin) {
+    case LSM6DSV16X_INT1_PIN:
+      /* Enable access to embedded functions registers */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Enable tilt detection */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      emb_func_en_a.tilt_en = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Tilt interrupt driven to INT1 pin */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      emb_func_int1.int1_tilt = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Disable access to embedded functions registers */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Enable routing the embedded functions interrupt */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val1.int1_emb_func = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+
+    case LSM6DSV16X_INT2_PIN:
+      /* Enable access to embedded functions registers */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Enable tilt detection */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      emb_func_en_a.tilt_en = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Tilt interrupt driven to INT2 pin */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      emb_func_int2.int2_tilt = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Disable access to embedded functions registers */
+      if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      /* Enable routing the embedded functions interrupt */
+      if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+
+      val2.int2_emb_func = PROPERTY_ENABLE;
+
+      if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+        return LSM6DSV16X_ERROR;
+      }
+      break;
+
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+ * @brief  Disable tilt detection
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Tilt_Detection()
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_md1_cfg_t val1;
+  lsm6dsv16x_md2_cfg_t val2;
+
+  lsm6dsv16x_emb_func_en_a_t emb_func_en_a;
+  lsm6dsv16x_emb_func_int1_t emb_func_int1;
+  lsm6dsv16x_emb_func_int2_t emb_func_int2;
+
+  /* Disable emb func event on either INT1 or INT2 pin */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val1.int1_emb_func = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD1_CFG, (uint8_t *)&val1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  val2.int2_emb_func = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_MD2_CFG, (uint8_t *)&val2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Enable access to embedded functions registers. */
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Disable tilt detection. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  emb_func_en_a.tilt_en = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset interrupt driven to INT1 pin. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  emb_func_int1.int1_tilt = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Reset interrupt driven to INT2 pin. */
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  emb_func_int2.int2_tilt = PROPERTY_DISABLE;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  /* Disable access to embedded functions registers. */
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return ret;
+}
+
+
 
 /**
  * @brief  Enable the LSM6DSV16X gyroscope sensor
