@@ -71,6 +71,22 @@ typedef enum {
   LSM6DSV16X_ERROR = -1
 } LSM6DSV16XStatusTypeDef;
 
+typedef enum {
+  LSM6DSV16X_INT1_PIN,
+  LSM6DSV16X_INT2_PIN,
+} LSM6DSV16X_SensorIntPin_t;
+
+typedef struct {
+  unsigned int FreeFallStatus : 1;
+  unsigned int TapStatus : 1;
+  unsigned int DoubleTapStatus : 1;
+  unsigned int WakeUpStatus : 1;
+  unsigned int StepStatus : 1;
+  unsigned int TiltStatus : 1;
+  unsigned int D6DOrientationStatus : 1;
+  unsigned int SleepStatus : 1;
+} LSM6DSV16X_Event_Status_t;
+
 typedef union {
   int16_t i16bit[3];
   uint8_t u8bit[6];
@@ -117,8 +133,47 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Get_X_AxesRaw(int16_t *Value);
     LSM6DSV16XStatusTypeDef Get_X_Axes(int32_t *Acceleration);
     LSM6DSV16XStatusTypeDef Get_X_DRDY_Status(uint8_t *Status);
+    LSM6DSV16XStatusTypeDef Get_X_Event_Status(LSM6DSV16X_Event_Status_t *Status);
     LSM6DSV16XStatusTypeDef Set_X_Power_Mode(uint8_t PowerMode);
     LSM6DSV16XStatusTypeDef Set_X_Filter_Mode(uint8_t LowHighPassFlag, uint8_t FilterMode);
+
+    LSM6DSV16XStatusTypeDef Enable_6D_Orientation(LSM6DSV16X_SensorIntPin_t IntPin);
+    LSM6DSV16XStatusTypeDef Disable_6D_Orientation();
+    LSM6DSV16XStatusTypeDef Set_6D_Orientation_Threshold(uint8_t Threshold);
+    LSM6DSV16XStatusTypeDef Get_6D_Orientation_XL(uint8_t *XLow);
+    LSM6DSV16XStatusTypeDef Get_6D_Orientation_XH(uint8_t *XHigh);
+    LSM6DSV16XStatusTypeDef Get_6D_Orientation_YL(uint8_t *YLow);
+    LSM6DSV16XStatusTypeDef Get_6D_Orientation_YH(uint8_t *YHigh);
+    LSM6DSV16XStatusTypeDef Get_6D_Orientation_ZL(uint8_t *ZLow);
+    LSM6DSV16XStatusTypeDef Get_6D_Orientation_ZH(uint8_t *ZHigh);
+
+    LSM6DSV16XStatusTypeDef Enable_Free_Fall_Detection(LSM6DSV16X_SensorIntPin_t IntPin);
+    LSM6DSV16XStatusTypeDef Disable_Free_Fall_Detection();
+    LSM6DSV16XStatusTypeDef Set_Free_Fall_Threshold(uint8_t Threshold);
+    LSM6DSV16XStatusTypeDef Set_Free_Fall_Duration(uint8_t Duration);
+
+    LSM6DSV16XStatusTypeDef Enable_Wake_Up_Detection(LSM6DSV16X_SensorIntPin_t IntPin);
+    LSM6DSV16XStatusTypeDef Disable_Wake_Up_Detection();
+    LSM6DSV16XStatusTypeDef Set_Wake_Up_Threshold(uint32_t Threshold);
+    LSM6DSV16XStatusTypeDef Set_Wake_Up_Duration(uint8_t Duration);
+
+    LSM6DSV16XStatusTypeDef Enable_Single_Tap_Detection(LSM6DSV16X_SensorIntPin_t IntPin);
+    LSM6DSV16XStatusTypeDef Disable_Single_Tap_Detection();
+    LSM6DSV16XStatusTypeDef Enable_Double_Tap_Detection(LSM6DSV16X_SensorIntPin_t IntPin);
+    LSM6DSV16XStatusTypeDef Disable_Double_Tap_Detection();
+    LSM6DSV16XStatusTypeDef Set_Tap_Threshold(uint8_t Threshold);
+    LSM6DSV16XStatusTypeDef Set_Tap_Shock_Time(uint8_t Time);
+    LSM6DSV16XStatusTypeDef Set_Tap_Quiet_Time(uint8_t Time);
+    LSM6DSV16XStatusTypeDef Set_Tap_Duration_Time(uint8_t Time);
+
+
+    LSM6DSV16XStatusTypeDef Enable_Pedometer(LSM6DSV16X_SensorIntPin_t IntPin);
+    LSM6DSV16XStatusTypeDef Disable_Pedometer();
+    LSM6DSV16XStatusTypeDef Get_Step_Count(uint16_t *StepCount);
+    LSM6DSV16XStatusTypeDef Step_Counter_Reset();
+
+    LSM6DSV16XStatusTypeDef Enable_Tilt_Detection(LSM6DSV16X_SensorIntPin_t IntPin);
+    LSM6DSV16XStatusTypeDef Disable_Tilt_Detection();
 
     LSM6DSV16XStatusTypeDef Enable_G();
     LSM6DSV16XStatusTypeDef Disable_G();
