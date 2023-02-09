@@ -13,6 +13,8 @@
 */
 #include <LSM6DSV16XSensor.h>
 
+#define INT1_pin PA4
+
 LSM6DSV16XSensor LSM6DSV16X(&Wire);
 
 //Interrupts.
@@ -32,7 +34,7 @@ void setup() {
   Wire.begin();
 
   // Enable INT1 pin.
-  attachInterrupt(PA4, INT1Event_cb, RISING);
+  attachInterrupt(INT1_pin, INT1Event_cb, RISING);
 
   // Initlialize components.
   LSM6DSV16X.begin();

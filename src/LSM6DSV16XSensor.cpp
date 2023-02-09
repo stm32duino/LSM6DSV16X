@@ -884,7 +884,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_6D_Orientation()
  */
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_6D_Orientation_Threshold(uint8_t Threshold)
 {
-  int32_t ret = LSM6DSV16X_OK;
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
   lsm6dsv16x_6d_threshold_t newThreshold = LSM6DSV16X_DEG_80;
 
   switch (Threshold) {
@@ -2304,7 +2304,294 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Tilt_Detection()
   return ret;
 }
 
+/**
+  * @brief  Get the LSM6DSV16X FIFO number of samples
 
+  * @param  NumSamples number of samples
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Num_Samples(uint16_t *NumSamples)
+{
+  return (LSM6DSV16XStatusTypeDef) lsm6dsv16x_fifo_data_level_get(&reg_ctx, NumSamples);
+}
+
+/**
+  * @brief  Get the LSM6DSV16X FIFO full status
+
+  * @param  Status FIFO full status
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Full_Status(uint8_t *Status)
+{
+  lsm6dsv16x_fifo_status2_t val;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FIFO_STATUS2, (uint8_t *)&val, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *Status = val.fifo_full_ia;
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+  * @brief  Set the LSM6DSV16X FIFO full interrupt on INT1 pin
+
+  * @param  Status FIFO full interrupt on INT1 pin status
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_INT1_FIFO_Full(uint8_t Status)
+{
+  lsm6dsv16x_int1_ctrl_t reg;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT1_CTRL, (uint8_t *)&reg, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  reg.int1_fifo_full = Status;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT1_CTRL, (uint8_t *)&reg, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+  * @brief  Set the LSM6DSV16X FIFO full interrupt on INT2 pin
+
+  * @param  Status FIFO full interrupt on INT1 pin status
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_INT2_FIFO_Full(uint8_t Status)
+{
+  lsm6dsv16x_int2_ctrl_t reg;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_INT2_CTRL, (uint8_t *)&reg, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  reg.int2_fifo_full = Status;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_INT2_CTRL, (uint8_t *)&reg, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+  * @brief  Set the LSM6DSV16X FIFO watermark level
+
+  * @param  Watermark FIFO watermark level
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_Watermark_Level(uint8_t Watermark)
+{
+  return (LSM6DSV16XStatusTypeDef) lsm6dsv16x_fifo_watermark_set(&reg_ctx, Watermark);
+}
+
+/**
+  * @brief  Set the LSM6DSV16X FIFO stop on watermark
+
+  * @param  Status FIFO stop on watermark status
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_Stop_On_Fth(uint8_t Status)
+{
+  return (LSM6DSV16XStatusTypeDef) lsm6dsv16x_fifo_stop_on_wtm_set(&reg_ctx, Status);
+}
+
+/**
+  * @brief  Set the LSM6DSV16X FIFO mode
+
+  * @param  Mode FIFO mode
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_Mode(uint8_t Mode)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_fifo_mode_t newMode = LSM6DSV16X_BYPASS_MODE;
+
+  switch (Mode) {
+    case 0:
+      newMode = LSM6DSV16X_BYPASS_MODE;
+      break;
+    case 1:
+      newMode = LSM6DSV16X_FIFO_MODE;
+      break;
+    case 3:
+      newMode = LSM6DSV16X_STREAM_TO_FIFO_MODE;
+      break;
+    case 4:
+      newMode = LSM6DSV16X_BYPASS_TO_STREAM_MODE;
+      break;
+    case 6:
+      newMode = LSM6DSV16X_STREAM_MODE;
+      break;
+    case 7:
+      newMode = LSM6DSV16X_BYPASS_TO_FIFO_MODE;
+      break;
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+
+  if (ret == LSM6DSV16X_ERROR) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_fifo_mode_set(&reg_ctx, newMode) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Get the LSM6DSV16X FIFO tag
+
+  * @param  Tag FIFO tag
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Tag(uint8_t *Tag)
+{
+  lsm6dsv16x_fifo_data_out_tag_t tag_local;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FIFO_DATA_OUT_TAG, (uint8_t *)&tag_local, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *Tag = (uint8_t)tag_local.tag_sensor;
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+  * @brief  Get the LSM6DSV16X FIFO raw data
+
+  * @param  Data FIFO raw data array [6]
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Data(uint8_t *Data)
+{
+  return (LSM6DSV16XStatusTypeDef) lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_FIFO_DATA_OUT_X_L, Data, 6);
+}
+
+/**
+  * @brief  Get the LSM6DSV16X FIFO accelero single sample (16-bit data per 3 axes) and calculate acceleration [mg]
+  * @param  Acceleration FIFO accelero axes [mg]
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_X_Axes(int32_t *Acceleration)
+{
+  lsm6dsv16x_axis3bit16_t data_raw;
+  float_t sensitivity = 0.0f;
+  float_t acceleration_float_t[3];
+
+  if (FIFO_Get_Data(data_raw.u8bit) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (Get_X_Sensitivity(&sensitivity) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+  acceleration_float_t[0] = (float_t)data_raw.i16bit[0] * sensitivity;
+  acceleration_float_t[1] = (float_t)data_raw.i16bit[1] * sensitivity;
+  acceleration_float_t[2] = (float_t)data_raw.i16bit[2] * sensitivity;
+
+  Acceleration[0] = (int32_t)acceleration_float_t[0];
+  Acceleration[1]  = (int32_t)acceleration_float_t[1];
+  Acceleration[2]  = (int32_t)acceleration_float_t[2];
+
+  return LSM6DSV16X_OK;
+
+}
+
+/**
+  * @brief  Set the LSM6DSV16X FIFO accelero BDR value
+
+  * @param  Bdr FIFO accelero BDR value
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_X_BDR(float_t Bdr)
+{
+  lsm6dsv16x_fifo_xl_batch_t new_bdr;
+
+  new_bdr = (Bdr <=    0.0f) ? LSM6DSV16X_XL_NOT_BATCHED
+            : (Bdr <=    1.8f) ? LSM6DSV16X_XL_BATCHED_AT_1Hz875
+            : (Bdr <=    7.5f) ? LSM6DSV16X_XL_BATCHED_AT_7Hz5
+            : (Bdr <=   15.0f) ? LSM6DSV16X_XL_BATCHED_AT_15Hz
+            : (Bdr <=   30.0f) ? LSM6DSV16X_XL_BATCHED_AT_30Hz
+            : (Bdr <=   60.0f) ? LSM6DSV16X_XL_BATCHED_AT_60Hz
+            : (Bdr <=  120.0f) ? LSM6DSV16X_XL_BATCHED_AT_120Hz
+            : (Bdr <=  240.0f) ? LSM6DSV16X_XL_BATCHED_AT_240Hz
+            : (Bdr <=  480.0f) ? LSM6DSV16X_XL_BATCHED_AT_480Hz
+            : (Bdr <=  960.0f) ? LSM6DSV16X_XL_BATCHED_AT_960Hz
+            : (Bdr <=  1920.0f) ? LSM6DSV16X_XL_BATCHED_AT_1920Hz
+            : (Bdr <= 3840.0f) ? LSM6DSV16X_XL_BATCHED_AT_3840Hz
+            :                    LSM6DSV16X_XL_BATCHED_AT_7680Hz;
+
+  return (LSM6DSV16XStatusTypeDef) lsm6dsv16x_fifo_xl_batch_set(&reg_ctx, new_bdr);
+}
+
+/**
+  * @brief  Get the LSM6DSV16X FIFO gyro single sample (16-bit data per 3 axes) and calculate angular velocity [mDPS]
+
+  * @param  AngularVelocity FIFO gyro axes [mDPS]
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_G_Axes(int32_t *AngularVelocity)
+{
+  lsm6dsv16x_axis3bit16_t data_raw;
+  float_t sensitivity = 0.0f;
+  float_t angular_velocity_float_t[3];
+
+  if (FIFO_Get_Data(data_raw.u8bit) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (Get_G_Sensitivity(&sensitivity) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  angular_velocity_float_t[0] = (float_t)data_raw.i16bit[0] * sensitivity;
+  angular_velocity_float_t[1] = (float_t)data_raw.i16bit[1] * sensitivity;
+  angular_velocity_float_t[2] = (float_t)data_raw.i16bit[2] * sensitivity;
+
+  AngularVelocity[0] = (int32_t)angular_velocity_float_t[0];
+  AngularVelocity[1] = (int32_t)angular_velocity_float_t[1];
+  AngularVelocity[2] = (int32_t)angular_velocity_float_t[2];
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+  * @brief  Set the LSM6DSV16X FIFO gyro BDR value
+
+  * @param  Bdr FIFO gyro BDR value
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_G_BDR(float_t Bdr)
+{
+  lsm6dsv16x_fifo_gy_batch_t new_bdr;
+
+  new_bdr = (Bdr <=    0.0f) ? LSM6DSV16X_GY_NOT_BATCHED
+            : (Bdr <=    1.8f) ? LSM6DSV16X_GY_BATCHED_AT_1Hz875
+            : (Bdr <=    7.5f) ? LSM6DSV16X_GY_BATCHED_AT_7Hz5
+            : (Bdr <=   15.0f) ? LSM6DSV16X_GY_BATCHED_AT_15Hz
+            : (Bdr <=   30.0f) ? LSM6DSV16X_GY_BATCHED_AT_30Hz
+            : (Bdr <=   60.0f) ? LSM6DSV16X_GY_BATCHED_AT_60Hz
+            : (Bdr <=  120.0f) ? LSM6DSV16X_GY_BATCHED_AT_120Hz
+            : (Bdr <=  240.0f) ? LSM6DSV16X_GY_BATCHED_AT_240Hz
+            : (Bdr <=  480.0f) ? LSM6DSV16X_GY_BATCHED_AT_480Hz
+            : (Bdr <=  960.0f) ? LSM6DSV16X_GY_BATCHED_AT_960Hz
+            : (Bdr <=  1920.0f) ? LSM6DSV16X_GY_BATCHED_AT_1920Hz
+            : (Bdr <= 3840.0f) ? LSM6DSV16X_GY_BATCHED_AT_3840Hz
+            :                    LSM6DSV16X_GY_BATCHED_AT_7680Hz;
+
+  return (LSM6DSV16XStatusTypeDef) lsm6dsv16x_fifo_gy_batch_set(&reg_ctx, new_bdr);
+}
 
 /**
  * @brief  Enable the LSM6DSV16X gyroscope sensor
