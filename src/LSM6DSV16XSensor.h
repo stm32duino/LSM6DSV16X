@@ -175,6 +175,20 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Enable_Tilt_Detection(LSM6DSV16X_SensorIntPin_t IntPin);
     LSM6DSV16XStatusTypeDef Disable_Tilt_Detection();
 
+    LSM6DSV16XStatusTypeDef FIFO_Get_Num_Samples(uint16_t *NumSamples);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Full_Status(uint8_t *Status);
+    LSM6DSV16XStatusTypeDef FIFO_Set_INT1_FIFO_Full(uint8_t Status);
+    LSM6DSV16XStatusTypeDef FIFO_Set_INT2_FIFO_Full(uint8_t Status);
+    LSM6DSV16XStatusTypeDef FIFO_Set_Watermark_Level(uint8_t Watermark);
+    LSM6DSV16XStatusTypeDef FIFO_Set_Stop_On_Fth(uint8_t Status);
+    LSM6DSV16XStatusTypeDef FIFO_Set_Mode(uint8_t Mode);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Tag(uint8_t *Tag);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Data(uint8_t *Data);
+    LSM6DSV16XStatusTypeDef FIFO_Get_X_Axes(int32_t *Acceleration);
+    LSM6DSV16XStatusTypeDef FIFO_Set_X_BDR(float_t Bdr);
+    LSM6DSV16XStatusTypeDef FIFO_Get_G_Axes(int32_t *AngularVelocity);
+    LSM6DSV16XStatusTypeDef FIFO_Set_G_BDR(float_t Bdr);
+
     LSM6DSV16XStatusTypeDef Enable_G();
     LSM6DSV16XStatusTypeDef Disable_G();
     LSM6DSV16XStatusTypeDef Get_G_Sensitivity(float *Sensitivity);

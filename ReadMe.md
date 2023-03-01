@@ -55,6 +55,10 @@ to find out the 6D orientation and display data on a hyperterminal.
 * LSM6DSV16X_Tilt_Detection: This application shows how to detect the tilt event using the LSM6DSV16X accelerometer.
 
 * LSM6DSV16X_Wake_Up_Detection: This application shows how to detect the wake-up event using the LSM6DSV16X accelerometer.
+
+* LSM6DSV16X_FIFO_Polling: This application shows how to get accelerometer and gyroscope data from FIFO in pooling mode and print them on terminal.
+
+* LSM6DSV16X_FIFO_Interrupt: This application shows how to get accelerometer and gyroscope data from FIFO using interrupt and print them on terminal.
 ## Documentation
 
 You can find the source files at  
