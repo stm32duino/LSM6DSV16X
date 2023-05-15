@@ -185,9 +185,9 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef FIFO_Get_Tag(uint8_t *Tag);
     LSM6DSV16XStatusTypeDef FIFO_Get_Data(uint8_t *Data);
     LSM6DSV16XStatusTypeDef FIFO_Get_X_Axes(int32_t *Acceleration);
-    LSM6DSV16XStatusTypeDef FIFO_Set_X_BDR(float_t Bdr);
+    LSM6DSV16XStatusTypeDef FIFO_Set_X_BDR(float Bdr);
     LSM6DSV16XStatusTypeDef FIFO_Get_G_Axes(int32_t *AngularVelocity);
-    LSM6DSV16XStatusTypeDef FIFO_Set_G_BDR(float_t Bdr);
+    LSM6DSV16XStatusTypeDef FIFO_Set_G_BDR(float Bdr);
 
     LSM6DSV16XStatusTypeDef Enable_G();
     LSM6DSV16XStatusTypeDef Disable_G();

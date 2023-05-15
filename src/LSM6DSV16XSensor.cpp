@@ -2486,8 +2486,8 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Data(uint8_t *Data)
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_X_Axes(int32_t *Acceleration)
 {
   lsm6dsv16x_axis3bit16_t data_raw;
-  float_t sensitivity = 0.0f;
-  float_t acceleration_float_t[3];
+  float sensitivity = 0.0f;
+  float acceleration_float[3];
 
   if (FIFO_Get_Data(data_raw.u8bit) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
@@ -2496,13 +2496,13 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_X_Axes(int32_t *Acceleration)
   if (Get_X_Sensitivity(&sensitivity) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
-  acceleration_float_t[0] = (float_t)data_raw.i16bit[0] * sensitivity;
-  acceleration_float_t[1] = (float_t)data_raw.i16bit[1] * sensitivity;
-  acceleration_float_t[2] = (float_t)data_raw.i16bit[2] * sensitivity;
+  acceleration_float[0] = (float)data_raw.i16bit[0] * sensitivity;
+  acceleration_float[1] = (float)data_raw.i16bit[1] * sensitivity;
+  acceleration_float[2] = (float)data_raw.i16bit[2] * sensitivity;
 
-  Acceleration[0] = (int32_t)acceleration_float_t[0];
-  Acceleration[1]  = (int32_t)acceleration_float_t[1];
-  Acceleration[2]  = (int32_t)acceleration_float_t[2];
+  Acceleration[0] = (int32_t)acceleration_float[0];
+  Acceleration[1]  = (int32_t)acceleration_float[1];
+  Acceleration[2]  = (int32_t)acceleration_float[2];
 
   return LSM6DSV16X_OK;
 
@@ -2514,7 +2514,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_X_Axes(int32_t *Acceleration)
   * @param  Bdr FIFO accelero BDR value
   * @retval 0 in case of success, an error code otherwise
   */
-LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_X_BDR(float_t Bdr)
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_X_BDR(float Bdr)
 {
   lsm6dsv16x_fifo_xl_batch_t new_bdr;
 
@@ -2544,8 +2544,8 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_X_BDR(float_t Bdr)
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_G_Axes(int32_t *AngularVelocity)
 {
   lsm6dsv16x_axis3bit16_t data_raw;
-  float_t sensitivity = 0.0f;
-  float_t angular_velocity_float_t[3];
+  float sensitivity = 0.0f;
+  float angular_velocity_float[3];
 
   if (FIFO_Get_Data(data_raw.u8bit) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
@@ -2555,13 +2555,13 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_G_Axes(int32_t *AngularVeloci
     return LSM6DSV16X_ERROR;
   }
 
-  angular_velocity_float_t[0] = (float_t)data_raw.i16bit[0] * sensitivity;
-  angular_velocity_float_t[1] = (float_t)data_raw.i16bit[1] * sensitivity;
-  angular_velocity_float_t[2] = (float_t)data_raw.i16bit[2] * sensitivity;
+  angular_velocity_float[0] = (float)data_raw.i16bit[0] * sensitivity;
+  angular_velocity_float[1] = (float)data_raw.i16bit[1] * sensitivity;
+  angular_velocity_float[2] = (float)data_raw.i16bit[2] * sensitivity;
 
-  AngularVelocity[0] = (int32_t)angular_velocity_float_t[0];
-  AngularVelocity[1] = (int32_t)angular_velocity_float_t[1];
-  AngularVelocity[2] = (int32_t)angular_velocity_float_t[2];
+  AngularVelocity[0] = (int32_t)angular_velocity_float[0];
+  AngularVelocity[1] = (int32_t)angular_velocity_float[1];
+  AngularVelocity[2] = (int32_t)angular_velocity_float[2];
 
   return LSM6DSV16X_OK;
 }
@@ -2572,7 +2572,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_G_Axes(int32_t *AngularVeloci
   * @param  Bdr FIFO gyro BDR value
   * @retval 0 in case of success, an error code otherwise
   */
-LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_G_BDR(float_t Bdr)
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_G_BDR(float Bdr)
 {
   lsm6dsv16x_fifo_gy_batch_t new_bdr;
 

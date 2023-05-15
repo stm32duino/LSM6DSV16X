@@ -108,64 +108,64 @@ static void bytecpy(uint8_t *target, uint8_t *source)
   * @{
   *
   */
-float_t lsm6dsv16x_from_fs2_to_mg(int16_t lsb)
+float lsm6dsv16x_from_fs2_to_mg(int16_t lsb)
 {
-  return ((float_t)lsb) * 0.061f;
+  return ((float)lsb) * 0.061f;
 }
 
-float_t lsm6dsv16x_from_fs4_to_mg(int16_t lsb)
+float lsm6dsv16x_from_fs4_to_mg(int16_t lsb)
 {
-  return ((float_t)lsb) * 0.122f;
+  return ((float)lsb) * 0.122f;
 }
 
-float_t lsm6dsv16x_from_fs8_to_mg(int16_t lsb)
+float lsm6dsv16x_from_fs8_to_mg(int16_t lsb)
 {
-  return ((float_t)lsb) * 0.244f;
+  return ((float)lsb) * 0.244f;
 }
 
-float_t lsm6dsv16x_from_fs16_to_mg(int16_t lsb)
+float lsm6dsv16x_from_fs16_to_mg(int16_t lsb)
 {
-  return ((float_t)lsb) * 0.488f;
+  return ((float)lsb) * 0.488f;
 }
 
-float_t lsm6dsv16x_from_fs125_to_mdps(int16_t lsb)
+float lsm6dsv16x_from_fs125_to_mdps(int16_t lsb)
 {
-  return ((float_t)lsb) * 4.375f;
+  return ((float)lsb) * 4.375f;
 }
 
-float_t lsm6dsv16x_from_fs250_to_mdps(int16_t lsb)
+float lsm6dsv16x_from_fs250_to_mdps(int16_t lsb)
 {
-  return ((float_t)lsb) * 8.750f;
+  return ((float)lsb) * 8.750f;
 }
 
-float_t lsm6dsv16x_from_fs500_to_mdps(int16_t lsb)
+float lsm6dsv16x_from_fs500_to_mdps(int16_t lsb)
 {
-  return ((float_t)lsb) * 17.50f;
+  return ((float)lsb) * 17.50f;
 }
 
-float_t lsm6dsv16x_from_fs1000_to_mdps(int16_t lsb)
+float lsm6dsv16x_from_fs1000_to_mdps(int16_t lsb)
 {
-  return ((float_t)lsb) * 35.0f;
+  return ((float)lsb) * 35.0f;
 }
 
-float_t lsm6dsv16x_from_fs2000_to_mdps(int16_t lsb)
+float lsm6dsv16x_from_fs2000_to_mdps(int16_t lsb)
 {
-  return ((float_t)lsb) * 70.0f;
+  return ((float)lsb) * 70.0f;
 }
 
-float_t lsm6dsv16x_from_fs4000_to_mdps(int16_t lsb)
+float lsm6dsv16x_from_fs4000_to_mdps(int16_t lsb)
 {
-  return ((float_t)lsb) * 140.0f;
+  return ((float)lsb) * 140.0f;
 }
 
-float_t lsm6dsv16x_from_lsb_to_celsius(int16_t lsb)
+float lsm6dsv16x_from_lsb_to_celsius(int16_t lsb)
 {
-  return (((float_t)lsb / 256.0f) + 25.0f);
+  return (((float)lsb / 256.0f) + 25.0f);
 }
 
-float_t lsm6dsv16x_from_lsb_to_nsec(uint32_t lsb)
+float lsm6dsv16x_from_lsb_to_nsec(uint32_t lsb)
 {
-  return ((float_t)lsb * 21750.0f);
+  return ((float)lsb * 21750.0f);
 }
 
 /**
@@ -237,7 +237,7 @@ int32_t lsm6dsv16x_xl_offset_mg_set(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_xl_offset_
   lsm6dsv16x_x_ofs_usr_t x_ofs_usr;
   lsm6dsv16x_ctrl9_t ctrl9;
   int32_t ret;
-  float_t tmp;
+  float tmp;
 
   ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_Z_OFS_USR, (uint8_t *)&z_ofs_usr, 1);
   if (ret == 0) {
@@ -324,13 +324,13 @@ int32_t lsm6dsv16x_xl_offset_mg_get(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_xl_offset_
   }
 
   if (ctrl9.usr_off_w == PROPERTY_DISABLE) {
-    val->z_mg = ((float_t)z_ofs_usr.z_ofs_usr * 0.0078125f);
-    val->y_mg = ((float_t)y_ofs_usr.y_ofs_usr * 0.0078125f);
-    val->x_mg = ((float_t)x_ofs_usr.x_ofs_usr * 0.0078125f);
+    val->z_mg = ((float)z_ofs_usr.z_ofs_usr * 0.0078125f);
+    val->y_mg = ((float)y_ofs_usr.y_ofs_usr * 0.0078125f);
+    val->x_mg = ((float)x_ofs_usr.x_ofs_usr * 0.0078125f);
   } else {
-    val->z_mg = ((float_t)z_ofs_usr.z_ofs_usr * 0.125f);
-    val->y_mg = ((float_t)y_ofs_usr.y_ofs_usr * 0.125f);
-    val->x_mg = ((float_t)x_ofs_usr.x_ofs_usr * 0.125f);
+    val->z_mg = ((float)z_ofs_usr.z_ofs_usr * 0.125f);
+    val->y_mg = ((float)y_ofs_usr.y_ofs_usr * 0.125f);
+    val->x_mg = ((float)x_ofs_usr.x_ofs_usr * 0.125f);
   }
 
   return ret;
@@ -8696,7 +8696,7 @@ int32_t lsm6dsv16x_act_thresholds_set(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_act_thre
   lsm6dsv16x_inactivity_dur_t inactivity_dur;
   lsm6dsv16x_wake_up_ths_t wake_up_ths;
   int32_t ret;
-  float_t tmp;
+  float tmp;
 
   ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_INACTIVITY_DUR, (uint8_t *)&inactivity_dur, 1);
   if (ret == 0) {
@@ -8710,50 +8710,50 @@ int32_t lsm6dsv16x_act_thresholds_set(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_act_thre
   if ((val.wk_ths_mg < (uint32_t)(7.8125f * 63.0f)) && (val.inact_ths_mg < (uint32_t)(7.8125f * 63.0f))) {
     inactivity_dur.wu_inact_ths_w = 0;
 
-    tmp = (float_t)val.inact_ths_mg / 7.8125f;
+    tmp = (float)val.inact_ths_mg / 7.8125f;
     inactivity_ths.inact_ths = (uint8_t)tmp;
 
-    tmp = (float_t)val.wk_ths_mg / 7.8125f;
+    tmp = (float)val.wk_ths_mg / 7.8125f;
     wake_up_ths.wk_ths = (uint8_t)tmp;
   } else if ((val.wk_ths_mg < (uint32_t)(15.625f * 63.0f)) && (val.inact_ths_mg < (uint32_t)(15.625f * 63.0f))) {
     inactivity_dur.wu_inact_ths_w = 1;
 
-    tmp = (float_t)val.inact_ths_mg / 15.625f;
+    tmp = (float)val.inact_ths_mg / 15.625f;
     inactivity_ths.inact_ths = (uint8_t)tmp;
 
-    tmp = (float_t)val.wk_ths_mg / 15.625f;
+    tmp = (float)val.wk_ths_mg / 15.625f;
     wake_up_ths.wk_ths = (uint8_t)tmp;
   } else if ((val.wk_ths_mg < (uint32_t)(31.25f * 63.0f)) && (val.inact_ths_mg < (uint32_t)(31.25f * 63.0f))) {
     inactivity_dur.wu_inact_ths_w = 2;
 
-    tmp = (float_t)val.inact_ths_mg / 31.25f;
+    tmp = (float)val.inact_ths_mg / 31.25f;
     inactivity_ths.inact_ths = (uint8_t)tmp;
 
-    tmp = (float_t)val.wk_ths_mg / 31.25f;
+    tmp = (float)val.wk_ths_mg / 31.25f;
     wake_up_ths.wk_ths = (uint8_t)tmp;
   } else if ((val.wk_ths_mg < (uint32_t)(62.5f * 63.0f)) && (val.inact_ths_mg < (uint32_t)(62.5f * 63.0f))) {
     inactivity_dur.wu_inact_ths_w = 3;
 
-    tmp = (float_t)val.inact_ths_mg / 62.5f;
+    tmp = (float)val.inact_ths_mg / 62.5f;
     inactivity_ths.inact_ths = (uint8_t)tmp;
 
-    tmp = (float_t)val.wk_ths_mg / 62.5f;
+    tmp = (float)val.wk_ths_mg / 62.5f;
     wake_up_ths.wk_ths = (uint8_t)tmp;
   } else if ((val.wk_ths_mg < (uint32_t)(125.0f * 63.0f)) && (val.inact_ths_mg < (uint32_t)(125.0f * 63.0f))) {
     inactivity_dur.wu_inact_ths_w = 4;
 
-    tmp = (float_t)val.inact_ths_mg / 125.0f;
+    tmp = (float)val.inact_ths_mg / 125.0f;
     inactivity_ths.inact_ths = (uint8_t)tmp;
 
-    tmp = (float_t)val.wk_ths_mg / 125.0f;
+    tmp = (float)val.wk_ths_mg / 125.0f;
     wake_up_ths.wk_ths = (uint8_t)tmp;
   } else if ((val.wk_ths_mg < (uint32_t)(250.0f * 63.0f)) && (val.inact_ths_mg < (uint32_t)(250.0f * 63.0f))) {
     inactivity_dur.wu_inact_ths_w = 5;
 
-    tmp = (float_t)val.inact_ths_mg / 250.0f;
+    tmp = (float)val.inact_ths_mg / 250.0f;
     inactivity_ths.inact_ths = (uint8_t)tmp;
 
-    tmp = (float_t)val.wk_ths_mg / 250.0f;
+    tmp = (float)val.wk_ths_mg / 250.0f;
     wake_up_ths.wk_ths = (uint8_t)tmp;
   } else { // out of limit
     inactivity_dur.wu_inact_ths_w = 5;
@@ -8790,7 +8790,7 @@ int32_t lsm6dsv16x_act_thresholds_get(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_act_thre
   lsm6dsv16x_inactivity_ths_t inactivity_ths;
   lsm6dsv16x_wake_up_ths_t wake_up_ths;
   int32_t ret;
-  float_t tmp;
+  float tmp;
 
   ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_INACTIVITY_DUR, (uint8_t *)&inactivity_dur, 1);
   if (ret == 0) {
@@ -8802,50 +8802,50 @@ int32_t lsm6dsv16x_act_thresholds_get(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_act_thre
 
   switch (inactivity_dur.wu_inact_ths_w) {
     case 0:
-      tmp = (float_t)wake_up_ths.wk_ths * 7.8125f;
+      tmp = (float)wake_up_ths.wk_ths * 7.8125f;
       val->wk_ths_mg = (uint32_t)tmp;
 
-      tmp = (float_t)inactivity_ths.inact_ths * 7.8125f;
+      tmp = (float)inactivity_ths.inact_ths * 7.8125f;
       val->inact_ths_mg = (uint32_t)tmp;
       break;
 
     case 1:
-      tmp = (float_t)wake_up_ths.wk_ths * 15.625f;
+      tmp = (float)wake_up_ths.wk_ths * 15.625f;
       val->wk_ths_mg = (uint32_t)tmp;
 
-      tmp = (float_t)inactivity_ths.inact_ths * 15.625f;
+      tmp = (float)inactivity_ths.inact_ths * 15.625f;
       val->inact_ths_mg = (uint32_t)tmp;
       break;
 
     case 2:
-      tmp = (float_t)wake_up_ths.wk_ths * 31.25f;
+      tmp = (float)wake_up_ths.wk_ths * 31.25f;
       val->wk_ths_mg = (uint32_t)tmp;
 
-      tmp = (float_t)inactivity_ths.inact_ths * 31.25f;
+      tmp = (float)inactivity_ths.inact_ths * 31.25f;
       val->inact_ths_mg = (uint32_t)tmp;
       break;
 
     case 3:
-      tmp = (float_t)wake_up_ths.wk_ths * 62.5f;
+      tmp = (float)wake_up_ths.wk_ths * 62.5f;
       val->wk_ths_mg = (uint32_t)tmp;
 
-      tmp = (float_t)inactivity_ths.inact_ths * 62.5f;
+      tmp = (float)inactivity_ths.inact_ths * 62.5f;
       val->inact_ths_mg = (uint32_t)tmp;
       break;
 
     case 4:
-      tmp = (float_t)wake_up_ths.wk_ths * 125.0f;
+      tmp = (float)wake_up_ths.wk_ths * 125.0f;
       val->wk_ths_mg = (uint32_t)tmp;
 
-      tmp = (float_t)inactivity_ths.inact_ths * 125.0f;
+      tmp = (float)inactivity_ths.inact_ths * 125.0f;
       val->inact_ths_mg = (uint32_t)tmp;
       break;
 
     default:
-      tmp = (float_t)wake_up_ths.wk_ths * 250.0f;
+      tmp = (float)wake_up_ths.wk_ths * 250.0f;
       val->wk_ths_mg = (uint32_t)tmp;
 
-      tmp = (float_t)inactivity_ths.inact_ths * 250.0f;
+      tmp = (float)inactivity_ths.inact_ths * 250.0f;
       val->inact_ths_mg = (uint32_t)tmp;
       break;
   }
