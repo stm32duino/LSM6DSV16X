@@ -63,6 +63,7 @@
 #define LSM6DSV16X_GYRO_SENSITIVITY_FS_2000DPS   70.000f
 #define LSM6DSV16X_GYRO_SENSITIVITY_FS_4000DPS  140.000f
 
+#define LSM6DSV16X_QVAR_GAIN  78.000f
 
 /* Typedefs ------------------------------------------------------------------*/
 
@@ -91,6 +92,11 @@ typedef union {
   int16_t i16bit[3];
   uint8_t u8bit[6];
 } lsm6dsv16x_axis3bit16_t;
+
+typedef union {
+  int16_t i16bit;
+  uint8_t u8bit[2];
+} lsm6dsv16x_axis1bit16_t;
 
 typedef enum {
   LSM6DSV16X_ACC_HIGH_PERFORMANCE_MODE,
@@ -201,6 +207,11 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Get_G_DRDY_Status(uint8_t *Status);
     LSM6DSV16XStatusTypeDef Set_G_Power_Mode(uint8_t PowerMode);
     LSM6DSV16XStatusTypeDef Set_G_Filter_Mode(uint8_t LowHighPassFlag, uint8_t FilterMode);
+
+    LSM6DSV16XStatusTypeDef QVAR_Enable();
+    LSM6DSV16XStatusTypeDef QVAR_GetStatus(uint8_t *val);
+    LSM6DSV16XStatusTypeDef QVAR_SetImpedance(uint16_t val);
+    LSM6DSV16XStatusTypeDef QVAR_GetData(float *Data);
 
     LSM6DSV16XStatusTypeDef Read_Reg(uint8_t Reg, uint8_t *Data);
     LSM6DSV16XStatusTypeDef Write_Reg(uint8_t Reg, uint8_t Data);
