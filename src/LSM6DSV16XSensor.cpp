@@ -259,7 +259,6 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_X_Sensitivity(float *Sensitivity)
 
 /**
  * @brief  Get the LSM6DSV16X accelerometer sensor output data rate
- * @param  pObj the device pObj
  * @param  Odr pointer where the output data rate is written
  * @retval 0 in case of success, an error code otherwise
  */
@@ -2940,7 +2939,6 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_G_FS(int32_t FullScale)
 
 /**
  * @brief  Get the LSM6DSV16X gyroscope sensor raw axes
- * @param  pObj the device pObj
  * @param  Value pointer where the raw values of the axes are written
  * @retval 0 in case of success, an error code otherwise
  */
@@ -3047,6 +3045,104 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_G_Filter_Mode(uint8_t LowHighPassF
       return LSM6DSV16X_ERROR;
     }
   }
+  return LSM6DSV16X_OK;
+}
+
+
+/**
+ * @brief  Enable the LSM6DSV16X QVAR sensor
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::QVAR_Enable()
+{
+  lsm6dsv16x_ctrl7_t ctrl7;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_CTRL7, (uint8_t *)&ctrl7, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  ctrl7.ah_qvar_en = 1;
+  ctrl7.int2_drdy_ah_qvar = 1;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_CTRL7, (uint8_t *)&ctrl7, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+
+/**
+ * @brief  Read LSM6DSV16X QVAR output data
+ * @param  Data pointer where the value is written
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::QVAR_GetData(float *Data)
+{
+  lsm6dsv16x_axis1bit16_t data_raw;
+  (void)memset(data_raw.u8bit, 0x00, sizeof(int16_t));
+
+  if (lsm6dsv16x_ah_qvar_raw_get(&reg_ctx, &data_raw.i16bit) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *Data = ((float)data_raw.i16bit) / LSM6DSV16X_QVAR_GAIN;
+  return LSM6DSV16X_OK;
+}
+
+
+/**
+ * @brief  Set LSM6DSV16X QVAR equivalent input impedance
+ * @param  val impedance in MOhm (2400MOhm, 730MOhm, 300MOhm, 255MOhm)
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::QVAR_SetImpedance(uint16_t val)
+{
+  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X_OK;
+  lsm6dsv16x_ah_qvar_zin_t imp;
+  switch (val) {
+    case 2400:
+      imp = LSM6DSV16X_2400MOhm;
+      break;
+    case 730:
+      imp = LSM6DSV16X_730MOhm;
+      break;
+    case 300:
+      imp = LSM6DSV16X_300MOhm;
+      break;
+    case 255:
+      imp = LSM6DSV16X_255MOhm;
+      break;
+    default:
+      ret = LSM6DSV16X_ERROR;
+      break;
+  }
+  if (ret != LSM6DSV16X_ERROR) {
+    if (lsm6dsv16x_ah_qvar_zin_set(&reg_ctx, imp) != LSM6DSV16X_OK) {
+      ret = LSM6DSV16X_ERROR;
+    }
+  }
+  return ret;
+}
+
+/**
+ * @brief  Read LSM6DSV16X QVAR status
+ * @param  val pointer where the value is written
+ * @retval 0 in case of success, an error code otherwise
+ */
+
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::QVAR_GetStatus(uint8_t *val)
+{
+
+  lsm6dsv16x_status_reg_t status;
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_STATUS_REG, (uint8_t *)&status, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  *val = status.ah_qvarda;
+
+
   return LSM6DSV16X_OK;
 }
 
