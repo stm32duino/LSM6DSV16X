@@ -143,6 +143,19 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Set_X_Power_Mode(uint8_t PowerMode);
     LSM6DSV16XStatusTypeDef Set_X_Filter_Mode(uint8_t LowHighPassFlag, uint8_t FilterMode);
 
+    LSM6DSV16XStatusTypeDef Enable_G();
+    LSM6DSV16XStatusTypeDef Disable_G();
+    LSM6DSV16XStatusTypeDef Get_G_Sensitivity(float *Sensitivity);
+    LSM6DSV16XStatusTypeDef Get_G_ODR(float *Odr);
+    LSM6DSV16XStatusTypeDef Set_G_ODR(float Odr, LSM6DSV16X_GYRO_Operating_Mode_t Mode = LSM6DSV16X_GYRO_HIGH_PERFORMANCE_MODE);
+    LSM6DSV16XStatusTypeDef Get_G_FS(int32_t *FullScale);
+    LSM6DSV16XStatusTypeDef Set_G_FS(int32_t FullScale);
+    LSM6DSV16XStatusTypeDef Get_G_AxesRaw(int16_t *Value);
+    LSM6DSV16XStatusTypeDef Get_G_Axes(int32_t *AngularRate);
+    LSM6DSV16XStatusTypeDef Get_G_DRDY_Status(uint8_t *Status);
+    LSM6DSV16XStatusTypeDef Set_G_Power_Mode(uint8_t PowerMode);
+    LSM6DSV16XStatusTypeDef Set_G_Filter_Mode(uint8_t LowHighPassFlag, uint8_t FilterMode);
+
     LSM6DSV16XStatusTypeDef Enable_6D_Orientation(LSM6DSV16X_SensorIntPin_t IntPin);
     LSM6DSV16XStatusTypeDef Disable_6D_Orientation();
     LSM6DSV16XStatusTypeDef Set_6D_Orientation_Threshold(uint8_t Threshold);
@@ -172,7 +185,6 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Set_Tap_Quiet_Time(uint8_t Time);
     LSM6DSV16XStatusTypeDef Set_Tap_Duration_Time(uint8_t Time);
 
-
     LSM6DSV16XStatusTypeDef Enable_Pedometer(LSM6DSV16X_SensorIntPin_t IntPin);
     LSM6DSV16XStatusTypeDef Disable_Pedometer();
     LSM6DSV16XStatusTypeDef Get_Step_Count(uint16_t *StepCount);
@@ -194,19 +206,6 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef FIFO_Set_X_BDR(float Bdr);
     LSM6DSV16XStatusTypeDef FIFO_Get_G_Axes(int32_t *AngularVelocity);
     LSM6DSV16XStatusTypeDef FIFO_Set_G_BDR(float Bdr);
-
-    LSM6DSV16XStatusTypeDef Enable_G();
-    LSM6DSV16XStatusTypeDef Disable_G();
-    LSM6DSV16XStatusTypeDef Get_G_Sensitivity(float *Sensitivity);
-    LSM6DSV16XStatusTypeDef Get_G_ODR(float *Odr);
-    LSM6DSV16XStatusTypeDef Set_G_ODR(float Odr, LSM6DSV16X_GYRO_Operating_Mode_t Mode = LSM6DSV16X_GYRO_HIGH_PERFORMANCE_MODE);
-    LSM6DSV16XStatusTypeDef Get_G_FS(int32_t *FullScale);
-    LSM6DSV16XStatusTypeDef Set_G_FS(int32_t FullScale);
-    LSM6DSV16XStatusTypeDef Get_G_AxesRaw(int16_t *Value);
-    LSM6DSV16XStatusTypeDef Get_G_Axes(int32_t *AngularRate);
-    LSM6DSV16XStatusTypeDef Get_G_DRDY_Status(uint8_t *Status);
-    LSM6DSV16XStatusTypeDef Set_G_Power_Mode(uint8_t PowerMode);
-    LSM6DSV16XStatusTypeDef Set_G_Filter_Mode(uint8_t LowHighPassFlag, uint8_t FilterMode);
 
     LSM6DSV16XStatusTypeDef QVAR_Enable();
     LSM6DSV16XStatusTypeDef QVAR_GetStatus(uint8_t *val);
