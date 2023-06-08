@@ -3133,7 +3133,6 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::QVAR_SetImpedance(uint16_t val)
 
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::QVAR_GetStatus(uint8_t *val)
 {
-
   lsm6dsv16x_status_reg_t status;
 
   if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_STATUS_REG, (uint8_t *)&status, 1) != LSM6DSV16X_OK) {
@@ -3142,6 +3141,33 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::QVAR_GetStatus(uint8_t *val)
 
   *val = status.ah_qvarda;
 
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get MLC status
+ * @param  status pointer where the MLC status is written
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_MLC_Status(lsm6dsv16x_mlc_status_mainpage_t *status)
+{
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_MLC_STATUS_MAINPAGE, (uint8_t *)status, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  return LSM6DSV16X_OK;
+}
+
+/**
+ * @brief  Get MLC output
+ * @param  output pointer where the MLC output is written
+ * @retval 0 in case of success, an error code otherwise
+ */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_MLC_Output(lsm6dsv16x_mlc_out_t *output)
+{
+  if (lsm6dsv16x_mlc_out_get(&reg_ctx, output) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
 
   return LSM6DSV16X_OK;
 }

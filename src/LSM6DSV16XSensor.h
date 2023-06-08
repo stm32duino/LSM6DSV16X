@@ -213,6 +213,9 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef QVAR_SetImpedance(uint16_t val);
     LSM6DSV16XStatusTypeDef QVAR_GetData(float *Data);
 
+    LSM6DSV16XStatusTypeDef Get_MLC_Status(lsm6dsv16x_mlc_status_mainpage_t *status);
+    LSM6DSV16XStatusTypeDef Get_MLC_Output(lsm6dsv16x_mlc_out_t *output);
+
     LSM6DSV16XStatusTypeDef Read_Reg(uint8_t Reg, uint8_t *Data);
     LSM6DSV16XStatusTypeDef Write_Reg(uint8_t Reg, uint8_t Data);
 
