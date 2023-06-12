@@ -1,6 +1,6 @@
 /*
    @file    LSM6DSV16X_MLC.ino
-   @author  STMicroelectronics  
+   @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X Machine Learning Core
  *******************************************************************************
    Copyright (c) 2023, STMicroelectronics
@@ -20,7 +20,7 @@
 //Interrupts.
 volatile int mems_event = 0;
 
-LSM6DSV16XSensor sensor (&Wire);
+LSM6DSV16XSensor sensor(&Wire);
 int32_t accel[3], angrate[3];
 
 // MLC
@@ -31,7 +31,8 @@ int32_t TotalNumberOfLine;
 void INT1Event_cb();
 void printMLCStatus(uint8_t status);
 
-void setup() {
+void setup()
+{
   lsm6dsv16x_mlc_out_t  mlc_out;
   // Led.
   pinMode(LED_BUILTIN, OUTPUT);
@@ -55,11 +56,11 @@ void setup() {
   Serial.print("UCF Number Line=");
   Serial.println(TotalNumberOfLine);
 
-  for (LineCounter=0; LineCounter<TotalNumberOfLine; LineCounter++) {
-    if(sensor.Write_Reg(ProgramPointer[LineCounter].address, ProgramPointer[LineCounter].data)) {
+  for (LineCounter = 0; LineCounter < TotalNumberOfLine; LineCounter++) {
+    if (sensor.Write_Reg(ProgramPointer[LineCounter].address, ProgramPointer[LineCounter].data)) {
       Serial.print("Error loading the Program to LSM6DSV16XSensor at line: ");
       Serial.println(LineCounter);
-      while(1) {
+      while (1) {
         // Led blinking.
         digitalWrite(LED_BUILTIN, HIGH);
         delay(250);
@@ -82,9 +83,10 @@ void setup() {
   printMLCStatus(mlc_out.mlc1_src);
 }
 
-void loop() {
+void loop()
+{
   if (mems_event) {
-    mems_event=0;
+    mems_event = 0;
     lsm6dsv16x_mlc_status_mainpage_t  status;
     sensor.Get_MLC_Status(&status);
     if (status.is_mlc1) {
@@ -95,12 +97,14 @@ void loop() {
   }
 }
 
-void INT1Event_cb() {
+void INT1Event_cb()
+{
   mems_event = 1;
 }
 
-void printMLCStatus(uint8_t status) {
-  switch(status) {
+void printMLCStatus(uint8_t status)
+{
+  switch (status) {
     case 0:
       Serial.println("Activity: Stationary");
       break;

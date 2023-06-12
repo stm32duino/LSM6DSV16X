@@ -22,7 +22,7 @@
 #define LSM6DSV16X_ACTIVITY_RECOGNITION_FOR_MOBILE_H
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
