@@ -21,7 +21,6 @@
 volatile int mems_event = 0;
 
 LSM6DSV16XSensor sensor(&Wire);
-int32_t accel[3], angrate[3];
 
 // MLC
 ucf_line_t *ProgramPointer;
