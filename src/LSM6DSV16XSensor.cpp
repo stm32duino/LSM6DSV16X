@@ -1802,7 +1802,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Tap_Threshold(uint8_t Threshold)
 
   tap_ths_6d.tap_ths_z = Threshold;
 
-  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_CFG0, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_THS_6D, (uint8_t *)&tap_ths_6d, 1) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
 
