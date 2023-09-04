@@ -53,6 +53,8 @@ The access to the sensor values is done as explained below:
 
 * LSM6DSV16X_Qvar_Polling: This application shows how to use LSM6DSV16X Qvar features in polling mode.
 
+* LSM6DSV16X_Sensor_Fusion: This application shows how to use LSM6DSV16X Sensor Fusion features for reading quaternions.
+
 * LSM6DSV16X_Single_Tap_Detection: This application shows how to detect the single tap event using the LSM6DSV16X accelerometer.
 
 * LSM6DSV16X_Tilt_Detection: This application shows how to detect the tilt event using the LSM6DSV16X accelerometer.

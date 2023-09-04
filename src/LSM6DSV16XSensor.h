@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file    LSM6DSV16XSensor.h
- * @author  SRA
+ * @author  STMicroelectronics
  * @version V1.0.0
  * @date    July 2022
  * @brief   Abstract Class of a LSM6DSV16X inertial measurement sensor.
@@ -208,12 +208,24 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef FIFO_Set_G_BDR(float Bdr);
 
     LSM6DSV16XStatusTypeDef QVAR_Enable();
+    LSM6DSV16XStatusTypeDef QVAR_Disable();
     LSM6DSV16XStatusTypeDef QVAR_GetStatus(uint8_t *val);
+    LSM6DSV16XStatusTypeDef QVAR_GetImpedance(uint16_t *val);
     LSM6DSV16XStatusTypeDef QVAR_SetImpedance(uint16_t val);
     LSM6DSV16XStatusTypeDef QVAR_GetData(float *Data);
 
     LSM6DSV16XStatusTypeDef Get_MLC_Status(lsm6dsv16x_mlc_status_mainpage_t *status);
     LSM6DSV16XStatusTypeDef Get_MLC_Output(lsm6dsv16x_mlc_out_t *output);
+
+    LSM6DSV16XStatusTypeDef Enable_Rotation_Vector();
+    LSM6DSV16XStatusTypeDef Disable_Rotation_Vector();
+    LSM6DSV16XStatusTypeDef Enable_Gravity_Vector();
+    LSM6DSV16XStatusTypeDef Disable_Gravity_Vector();
+    LSM6DSV16XStatusTypeDef Enable_Gyroscope_Bias();
+    LSM6DSV16XStatusTypeDef Disable_Gyroscope_Bias();
+    LSM6DSV16XStatusTypeDef FIFO_Get_Rotation_Vector(float *rvec);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Gravity_Vector(float *gvec);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Gyroscope_Bias(float *gbias);
 
     LSM6DSV16XStatusTypeDef Read_Reg(uint8_t Reg, uint8_t *Data);
     LSM6DSV16XStatusTypeDef Write_Reg(uint8_t Reg, uint8_t Data);
@@ -314,6 +326,9 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Set_X_ODR_When_Disabled(float Odr);
     LSM6DSV16XStatusTypeDef Set_G_ODR_When_Enabled(float Odr);
     LSM6DSV16XStatusTypeDef Set_G_ODR_When_Disabled(float Odr);
+    LSM6DSV16XStatusTypeDef npy_halfbits_to_floatbits(uint16_t h, uint32_t *f);
+    LSM6DSV16XStatusTypeDef npy_half_to_float(uint16_t h, float *f);
+    LSM6DSV16XStatusTypeDef sflp2q(float quat[4], uint16_t sflp[3]);
 
     /* Helper classes. */
     TwoWire *dev_i2c;
@@ -324,8 +339,8 @@ class LSM6DSV16XSensor {
     int cs_pin;
     uint32_t spi_speed;
 
-    lsm6dsv16x_xl_data_rate_t acc_odr;
-    lsm6dsv16x_gy_data_rate_t gyro_odr;
+    lsm6dsv16x_data_rate_t acc_odr;
+    lsm6dsv16x_data_rate_t gyro_odr;
     uint8_t acc_is_enabled;
     uint8_t gyro_is_enabled;
     uint8_t initialized;
