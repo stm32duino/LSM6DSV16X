@@ -7,7 +7,7 @@
 #######################################
 
 LSM6DSV16XSensor	KEYWORD1
-LSM6DSV16XStatusTypeDef KEYWORD1
+LSM6DSV16XStatusTypeDef 	KEYWORD1
 LSM6DSV16X_Event_Status_t	KEYWORD1
 LSM6DSV16X_SensorIntPin_t	KEYWORD1
 LSM6DSV16X_ACC_Operating_Mode_t	KEYWORD1
@@ -90,12 +90,22 @@ FIFO_Set_X_BDR	KEYWORD2
 FIFO_Get_G_Axes	KEYWORD2
 FIFO_Set_G_BDR	KEYWORD2
 QVAR_Enable	KEYWORD2
+QVAR_Disable	KEYWORD2
 QVAR_GetStatus	KEYWORD2
+QVAR_GetImpedance	KEYWORD2
 QVAR_SetImpedance	KEYWORD2
 QVAR_GetData	KEYWORD2
 Get_MLC_Status	KEYWORD2
 Get_MLC_Output	KEYWORD2
-
+Enable_Rotation_Vector	KEYWORD2
+Disable_Rotation_Vector	KEYWORD2
+Enable_Gravity_Vector()	KEYWORD2
+Disable_Gravity_Vector	KEYWORD2
+Enable_Gyroscope_Bias	KEYWORD2
+Disable_Gyroscope_Bias	KEYWORD2
+FIFO_Get_Rotation_Vector	KEYWORD2
+FIFO_Get_Gravity_Vector	KEYWORD2
+FIFO_Get_Gyroscope_Bias	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################

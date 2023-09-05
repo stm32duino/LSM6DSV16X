@@ -1,6 +1,6 @@
 /*
    @file    LSM6DSV16X_DataLog_Terminal.ino
-   @author  Giuseppe Roberti <giuseppe.roberti@ieee.org>
+   @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X inertial measurement sensor
  *******************************************************************************
    Copyright (c) 2022, STMicroelectronics
