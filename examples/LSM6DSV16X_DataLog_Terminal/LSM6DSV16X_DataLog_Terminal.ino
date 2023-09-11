@@ -31,18 +31,18 @@ void loop() {
   sensor.Get_G_Axes(angrate);
 
   Serial.print("Accel-X[mg]:");
-  Serial.print(accel[0], 2);
+  Serial.print(accel[0]);
   Serial.print(",Accel-Y[mg]:");
-  Serial.print(accel[0], 2);
+  Serial.print(accel[1]);
   Serial.print(",Accel-Z[mg]:");
-  Serial.print(accel[0], 2);
+  Serial.println(accel[2]);
 
-  Serial.print(",AngRate-X[mdps]:");
-  Serial.println(angrate[0], 2);
+  Serial.print("AngRate-X[mdps]:");
+  Serial.print(angrate[0]);
   Serial.print(",AngRate-Y[mdps]:");
-  Serial.println(angrate[1], 2);
+  Serial.print(angrate[1]);
   Serial.print(",AngRate-Z[mdps]:");
-  Serial.println(angrate[2], 2);
+  Serial.println(angrate[2]);
 
   blink(LED_BUILTIN);
 }
