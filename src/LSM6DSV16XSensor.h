@@ -52,9 +52,9 @@
 /* Defines -------------------------------------------------------------------*/
 /* For compatibility with ESP32 platforms */
 #ifdef ESP32
-#ifndef MSBFIRST
-#define MSBFIRST SPI_MSBFIRST
-#endif
+  #ifndef MSBFIRST
+    #define MSBFIRST SPI_MSBFIRST
+  #endif
 #endif
 
 #define LSM6DSV16X_ACC_SENSITIVITY_FS_2G   0.061f
