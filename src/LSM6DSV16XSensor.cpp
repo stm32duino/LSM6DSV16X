@@ -1827,6 +1827,8 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Tap_Shock_Time(uint8_t Time)
   if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_TAP_DUR, (uint8_t *)&tap_dur, 1) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
+
+  return LSM6DSV16X_OK;
 }
 
 /**
@@ -3513,7 +3515,6 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Rotation_Vector(float *rvec)
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Gravity_Vector(float *gvec)
 {
   lsm6dsv16x_axis3bit16_t data_raw;
-  float gvec_float[3];
 
   if (FIFO_Get_Data(data_raw.u8bit) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
