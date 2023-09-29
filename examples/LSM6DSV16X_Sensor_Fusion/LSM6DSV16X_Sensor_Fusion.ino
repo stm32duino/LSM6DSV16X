@@ -13,6 +13,12 @@
 
  *******************************************************************************
 */
+
+/*
+ * You can display the quaternion values with a 3D model connecting for example to this link:
+ * https://adafruit.github.io/Adafruit_WebSerial_3DModelViewer/
+ */
+
 #include <LSM6DSV16XSensor.h>
 
 #define ALGO_FREQ  120U /* Algorithm frequency 120Hz */
@@ -69,13 +75,13 @@ void loop()
 
         // Print Quaternion data
         Serial.print("Quaternion: ");
-        Serial.print(quaternions[3], 4);
+        Serial.print(-quaternions[3], 4);
+        Serial.print(", ");
+        Serial.print(-quaternions[0], 4);
         Serial.print(", ");
         Serial.print(-quaternions[1], 4);
         Serial.print(", ");
-        Serial.print(quaternions[0], 4);
-        Serial.print(", ");
-        Serial.println(quaternions[2], 4);
+        Serial.println(-quaternions[2], 4);
 
         // Compute the elapsed time within loop cycle and wait
         elapsedTime = millis() - startTime;
