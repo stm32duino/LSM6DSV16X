@@ -106,6 +106,8 @@ Disable_Gyroscope_Bias	KEYWORD2
 FIFO_Get_Rotation_Vector	KEYWORD2
 FIFO_Get_Gravity_Vector	KEYWORD2
 FIFO_Get_Gyroscope_Bias	KEYWORD2
+Reset_SFLP	KEYWORD2
+
 #######################################
 # Constants (LITERAL1)
 #######################################
