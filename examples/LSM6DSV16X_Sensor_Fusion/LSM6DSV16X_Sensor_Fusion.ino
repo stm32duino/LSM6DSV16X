@@ -86,7 +86,7 @@ void loop()
         // Compute the elapsed time within loop cycle and wait
         elapsedTime = millis() - startTime;
 
-        if ((long)(ALGO_PERIOD - elapsedTime)) {
+        if ((long)(ALGO_PERIOD - elapsedTime) > 0) {
           delay(ALGO_PERIOD - elapsedTime);
         }
       }
