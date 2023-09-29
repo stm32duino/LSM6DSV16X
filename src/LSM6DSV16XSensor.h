@@ -232,6 +232,7 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef FIFO_Get_Rotation_Vector(float *rvec);
     LSM6DSV16XStatusTypeDef FIFO_Get_Gravity_Vector(float *gvec);
     LSM6DSV16XStatusTypeDef FIFO_Get_Gyroscope_Bias(float *gbias);
+    LSM6DSV16XStatusTypeDef Reset_SFLP();
 
     LSM6DSV16XStatusTypeDef Read_Reg(uint8_t Reg, uint8_t *Data);
     LSM6DSV16XStatusTypeDef Write_Reg(uint8_t Reg, uint8_t Data);
