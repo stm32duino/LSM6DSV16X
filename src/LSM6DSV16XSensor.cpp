@@ -3547,6 +3547,33 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Get_Gyroscope_Bias(float *gbias)
   return LSM6DSV16X_OK;
 }
 
+/**
+  * @brief Reset SFLP
+  * @retval 0 in case of success, an error code otherwise
+  */
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Reset_SFLP(void)
+{
+  lsm6dsv16x_emb_func_init_a_t emb_func_init_a;
+
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_read_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INIT_A, (uint8_t *)&emb_func_init_a, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  emb_func_init_a.sflp_game_init = 1;
+
+  if (lsm6dsv16x_write_reg(&reg_ctx, LSM6DSV16X_EMB_FUNC_INIT_A, (uint8_t *)&emb_func_init_a, 1) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  if (lsm6dsv16x_mem_bank_set(&reg_ctx, LSM6DSV16X_MAIN_MEM_BANK) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+  return LSM6DSV16X_OK;
+}
 
 /**
  * @brief  Get the LSM6DSV16X register value

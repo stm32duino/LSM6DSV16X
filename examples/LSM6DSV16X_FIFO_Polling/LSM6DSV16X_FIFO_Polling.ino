@@ -36,51 +36,53 @@ uint32_t pos = 0;
 
 void Read_FIFO_Data();
 
-void setup() {
-  
+void setup()
+{
+
   Serial.begin(115200);
   Wire.begin();
-  
+
   // Initialize LSM6DSV16X.
   AccGyr.begin();
   status |= AccGyr.Enable_X();
   status |= AccGyr.Enable_G();
-  
+
   // Configure ODR and FS of the acc and gyro
   status |= AccGyr.Set_X_ODR(SENSOR_ODR);
   status |= AccGyr.Set_X_FS(ACC_FS);
   status |= AccGyr.Set_G_ODR(SENSOR_ODR);
   status |= AccGyr.Set_G_FS(GYR_FS);
-  
+
   // Configure FIFO BDR for acc and gyro
   status |= AccGyr.FIFO_Set_X_BDR(SENSOR_ODR);
   status |= AccGyr.FIFO_Set_G_BDR(SENSOR_ODR);
 
   // Set FIFO in Continuous mode
   status |= AccGyr.FIFO_Set_Mode(LSM6DSV16X_STREAM_MODE);
-  
-  if(status != LSM6DSV16X_OK) {
+
+  if (status != LSM6DSV16X_OK) {
     Serial.println("LSM6DSV16X Sensor failed to init/configure");
-    while(1);
+    while (1);
   }
   Serial.println("LSM6DSV16X FIFO Demo");
 }
 
-void loop() {
+void loop()
+{
   uint16_t fifo_samples;
 
   // Check the number of samples inside FIFO
-  if(AccGyr.FIFO_Get_Num_Samples(&fifo_samples) != LSM6DSV16X_OK){
-      Serial.println("LSM6DSV16X Sensor failed to get number of samples inside FIFO");
-      while(1);
+  if (AccGyr.FIFO_Get_Num_Samples(&fifo_samples) != LSM6DSV16X_OK) {
+    Serial.println("LSM6DSV16X Sensor failed to get number of samples inside FIFO");
+    while (1);
   }
 
   // If we reach the threshold we can empty the FIFO
   if (fifo_samples > FIFO_SAMPLE_THRESHOLD) {
-    
+
     // Empty the FIFO
     Read_FIFO_Data();
-    
+
     // Print FIFO data
     Serial.print(buff);
   }
@@ -90,42 +92,42 @@ void Read_FIFO_Data()
 {
   uint16_t i;
   uint16_t samples_to_read;
-  
+
   // Check the number of samples inside FIFO
-  if(AccGyr.FIFO_Get_Num_Samples(&samples_to_read) != LSM6DSV16X_OK){
-      Serial.println("LSM6DSV16X Sensor failed to get number of samples inside FIFO");
-      while(1);
+  if (AccGyr.FIFO_Get_Num_Samples(&samples_to_read) != LSM6DSV16X_OK) {
+    Serial.println("LSM6DSV16X Sensor failed to get number of samples inside FIFO");
+    while (1);
   }
-  
+
   for (i = 0; i < samples_to_read; i++) {
     uint8_t tag;
-    
+
     // Check the FIFO tag
-    if(AccGyr.FIFO_Get_Tag(&tag) != LSM6DSV16X_OK){
+    if (AccGyr.FIFO_Get_Tag(&tag) != LSM6DSV16X_OK) {
       Serial.println("LSM6DSV16X Sensor failed to get tag");
-      while(1);
+      while (1);
     }
     switch (tag) {
       // If we have a gyro tag, read the gyro data
       case 1: {
-          if(AccGyr.FIFO_Get_G_Axes(gyr_value) != LSM6DSV16X_OK){
+          if (AccGyr.FIFO_Get_G_Axes(gyr_value) != LSM6DSV16X_OK) {
             Serial.println("LSM6DSV16X Sensor failed to get gyroscope data");
-            while(1);
+            while (1);
           }
           gyr_available = true;
           break;
         }
-        
+
       // If we have an acc tag, read the acc data
       case 2: {
-          if(AccGyr.FIFO_Get_X_Axes(acc_value) != LSM6DSV16X_OK){
+          if (AccGyr.FIFO_Get_X_Axes(acc_value) != LSM6DSV16X_OK) {
             Serial.println("LSM6DSV16X Sensor failed to get accelerometer data");
-            while(1);
+            while (1);
           }
           acc_available = true;
           break;
         }
-        
+
       // We can discard other tags
       default: {
           break;

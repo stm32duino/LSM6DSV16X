@@ -17,17 +17,22 @@
 
 #define ALGO_FREQ  120U /* Algorithm frequency 120Hz */
 #define ALGO_PERIOD  (1000U / ALGO_FREQ) /* Algorithm period [ms] */
-unsigned long startTime, elapsedTime; 
- 
+unsigned long startTime, elapsedTime;
+
 LSM6DSV16XSensor AccGyr(&Wire);
 uint8_t status = 0;
-uint8_t tag = 0;
-float quaternions[4]={0};
+uint32_t k = 0;
 
-void setup() {
-  
+uint8_t tag = 0;
+float quaternions[4] = {0};
+
+void setup()
+{
+
   Serial.begin(115200);
-  while (!Serial) yield();
+  while (!Serial) {
+    yield();
+  }
 
   Wire.begin();
   // Initialize LSM6DSV16X.
@@ -36,44 +41,57 @@ void setup() {
   // Enable Sensor Fusion
   status |= AccGyr.Enable_Rotation_Vector();
 
-  if(status != LSM6DSV16X_OK) {
+  if (status != LSM6DSV16X_OK) {
     Serial.println("LSM6DSV16X Sensor failed to init/configure");
-    while(1);
+    while (1);
   }
   Serial.println("LSM6DSV16X SFLP Demo");
 }
 
-void loop() {
+void loop()
+{
   uint16_t fifo_samples;
   // Get start time of loop cycle
-  startTime = millis(); 
+  startTime = millis();
+
   // Check the number of samples inside FIFO
-  if(AccGyr.FIFO_Get_Num_Samples(&fifo_samples) != LSM6DSV16X_OK){
-      Serial.println("LSM6DSV16X Sensor failed to get number of samples inside FIFO");
-      while(1);
+  if (AccGyr.FIFO_Get_Num_Samples(&fifo_samples) != LSM6DSV16X_OK) {
+    Serial.println("LSM6DSV16X Sensor failed to get number of samples inside FIFO");
+    while (1);
   }
-  
-  // Read the FIFO if there is one stored sample 
+
+  // Read the FIFO if there is one stored sample
   if (fifo_samples > 0) {
-      for (int i = 0; i < fifo_samples; i++) {
-          AccGyr.FIFO_Get_Tag(&tag);
-          if(tag==0x13u){
-            AccGyr.FIFO_Get_Rotation_Vector(&quaternions[0]);
-    
-            // Print Quaternion data
-            Serial.print("Quaternion: ");
-            Serial.print(quaternions[3], 4);
-            Serial.print(", ");
-            Serial.print(-quaternions[1], 4);
-            Serial.print(", ");
-            Serial.print(quaternions[0], 4);
-            Serial.print(", ");
-            Serial.println(quaternions[2], 4);
-            
-            // Compute the elapsed time within loop cycle and wait
-            elapsedTime = millis() - startTime;
-            delay(ALGO_PERIOD - elapsedTime);  
-         }
+    for (int i = 0; i < fifo_samples; i++) {
+      AccGyr.FIFO_Get_Tag(&tag);
+      if (tag == 0x13u) {
+        AccGyr.FIFO_Get_Rotation_Vector(&quaternions[0]);
+
+        // Print Quaternion data
+        Serial.print("Quaternion: ");
+        Serial.print(quaternions[3], 4);
+        Serial.print(", ");
+        Serial.print(-quaternions[1], 4);
+        Serial.print(", ");
+        Serial.print(quaternions[0], 4);
+        Serial.print(", ");
+        Serial.println(quaternions[2], 4);
+
+        // Compute the elapsed time within loop cycle and wait
+        elapsedTime = millis() - startTime;
+
+        if ((long)(ALGO_PERIOD - elapsedTime)) {
+          delay(ALGO_PERIOD - elapsedTime);
+        }
       }
+    }
   }
 }
+
+
+
+
+
+
+
+

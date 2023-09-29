@@ -1,6 +1,6 @@
 /*
    @file    LSM6DSV16X_Single_Tap_Detection.ino
-   @author  STMicroelectronics  
+   @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X Single Tap Detection
  *******************************************************************************
    Copyright (c) 2022, STMicroelectronics
@@ -21,7 +21,8 @@ volatile int mems_event = 0;
 
 void INT1Event_cb();
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   delay(1000);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -29,7 +30,7 @@ void setup() {
 
   //Interrupts.
   attachInterrupt(INT1_pin, INT1Event_cb, RISING);
-    
+
   // Initlialize components.
   LSM6DSV16X.begin();
   LSM6DSV16X.Enable_X();
@@ -38,14 +39,13 @@ void setup() {
   LSM6DSV16X.Enable_Single_Tap_Detection(LSM6DSV16X_INT1_PIN);
 }
 
-void loop() {
-  if (mems_event)
-  {
+void loop()
+{
+  if (mems_event) {
     mems_event = 0;
     LSM6DSV16X_Event_Status_t status;
     LSM6DSV16X.Get_X_Event_Status(&status);
-    if (status.TapStatus)
-    {
+    if (status.TapStatus) {
 
       // Led blinking.
       digitalWrite(LED_BUILTIN, HIGH);

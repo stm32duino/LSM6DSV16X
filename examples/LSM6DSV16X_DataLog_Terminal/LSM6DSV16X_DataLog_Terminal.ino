@@ -14,10 +14,11 @@
 
 #include <LSM6DSV16XSensor.h>
 
-LSM6DSV16XSensor sensor (&Wire);
+LSM6DSV16XSensor sensor(&Wire);
 int32_t accel[3], angrate[3];
 
-void setup() {
+void setup()
+{
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   Wire.begin();
@@ -26,7 +27,8 @@ void setup() {
   sensor.Enable_G();
 }
 
-void loop() {
+void loop()
+{
   sensor.Get_X_Axes(accel);
   sensor.Get_G_Axes(angrate);
 
@@ -47,7 +49,8 @@ void loop() {
   blink(LED_BUILTIN);
 }
 
-inline void blink(int pin) {
+inline void blink(int pin)
+{
   digitalWrite(pin, HIGH);
   delay(25);
   digitalWrite(pin, LOW);
