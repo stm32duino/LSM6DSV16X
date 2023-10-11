@@ -88,7 +88,7 @@ void sendOrientation()
   LSM6DSV16X.Get_6D_Orientation_ZL(&zl);
   LSM6DSV16X.Get_6D_Orientation_ZH(&zh);
 
-  if (xl == 1 && yl == 0 && zl == 0 && xh == 0 && yh == 0 && zh == 0) {
+  if (xl == 0 && yl == 0 && zl == 0 && xh == 0 && yh == 1 && zh == 0) {
     sprintf(report, "\r\n  ________________  " \
             "\r\n |                | " \
             "\r\n |  *             | " \
@@ -99,7 +99,7 @@ void sendOrientation()
             "\r\n |________________| \r\n");
   }
 
-  else if (xl == 0 && yl == 1 && zl == 0 && xh == 0 && yh == 0 && zh == 0) {
+  else if (xl == 1 && yl == 0 && zl == 0 && xh == 0 && yh == 0 && zh == 0) {
     sprintf(report, "\r\n  ________________  " \
             "\r\n |                | " \
             "\r\n |             *  | " \
@@ -110,7 +110,7 @@ void sendOrientation()
             "\r\n |________________| \r\n");
   }
 
-  else if (xl == 0 && yl == 0 && zl == 0 && xh == 0 && yh == 1 && zh == 0) {
+  else if (xl == 0 && yl == 0 && zl == 0 && xh == 1 && yh == 0 && zh == 0) {
     sprintf(report, "\r\n  ________________  " \
             "\r\n |                | " \
             "\r\n |                | " \
@@ -121,7 +121,7 @@ void sendOrientation()
             "\r\n |________________| \r\n");
   }
 
-  else if (xl == 0 && yl == 0 && zl == 0 && xh == 1 && yh == 0 && zh == 0) {
+  else if (xl == 0 && yl == 1 && zl == 0 && xh == 0 && yh == 0 && zh == 0) {
     sprintf(report, "\r\n  ________________  " \
             "\r\n |                | " \
             "\r\n |                | " \
@@ -144,7 +144,7 @@ void sendOrientation()
   }
 
   else {
-    sprintf(report, "None of the 6D orientation axes is set in accelrometer.\r\n");
+    sprintf(report, "None of the 6D orientation axes is set in accelerometer.\r\n");
   }
 
   Serial.print(report);
