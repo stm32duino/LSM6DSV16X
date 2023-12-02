@@ -71,6 +71,16 @@
 
 #define LSM6DSV16X_QVAR_GAIN  78.000f
 
+#define LSM6DSV16X_MIN_ST_LIMIT_mg         50.0f
+#define LSM6DSV16X_MAX_ST_LIMIT_mg       1700.0f
+#define LSM6DSV16X_MIN_ST_LIMIT_mdps   150000.0f
+#define LSM6DSV16X_MAX_ST_LIMIT_mdps   700000.0f
+
+#define LSM6DSV16X_ACC_USR_OFF_W_HIGH_LSB (float)(pow(2, -6))
+#define LSM6DSV16X_ACC_USR_OFF_W_LOW_LSB (float)(pow(2, -10))
+#define LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX LSM6DSV16X_ACC_USR_OFF_W_HIGH_LSB * INT8_MAX
+#define LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX LSM6DSV16X_ACC_USR_OFF_W_LOW_LSB * INT8_MAX
+
 /* Typedefs ------------------------------------------------------------------*/
 
 typedef enum {
@@ -103,6 +113,12 @@ typedef union {
   int16_t i16bit;
   uint8_t u8bit[2];
 } lsm6dsv16x_axis1bit16_t;
+
+typedef enum {
+  LSM6DSV16X_RESET_GLOBAL = 0x1,
+  LSM6DSV16X_RESET_CAL_PARAM = 0x2,
+  LSM6DSV16X_RESET_CTRL_REGS = 0x4,
+} LSM6DSV16X_Reset_t;
 
 typedef enum {
   LSM6DSV16X_ACC_HIGH_PERFORMANCE_MODE,
@@ -148,6 +164,9 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Get_X_Event_Status(LSM6DSV16X_Event_Status_t *Status);
     LSM6DSV16XStatusTypeDef Set_X_Power_Mode(uint8_t PowerMode);
     LSM6DSV16XStatusTypeDef Set_X_Filter_Mode(uint8_t LowHighPassFlag, uint8_t FilterMode);
+    LSM6DSV16XStatusTypeDef Enable_X_User_Offset();
+    LSM6DSV16XStatusTypeDef Disable_X_User_Offset();
+    LSM6DSV16XStatusTypeDef Set_X_User_Offset(float x, float y, float z);
 
     LSM6DSV16XStatusTypeDef Enable_G();
     LSM6DSV16XStatusTypeDef Disable_G();
@@ -161,6 +180,14 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Get_G_DRDY_Status(uint8_t *Status);
     LSM6DSV16XStatusTypeDef Set_G_Power_Mode(uint8_t PowerMode);
     LSM6DSV16XStatusTypeDef Set_G_Filter_Mode(uint8_t LowHighPassFlag, uint8_t FilterMode);
+
+    LSM6DSV16XStatusTypeDef Get_Temp_ODR(float *Odr);
+    LSM6DSV16XStatusTypeDef Set_Temp_ODR(float Odr);
+    LSM6DSV16XStatusTypeDef Get_Temp_Raw(int16_t *value);
+
+    LSM6DSV16XStatusTypeDef Test_IMU(uint8_t XTestType, uint8_t GTestType);
+    LSM6DSV16XStatusTypeDef Test_X_IMU(uint8_t TestType);
+    LSM6DSV16XStatusTypeDef Test_G_IMU(uint8_t TestType);
 
     LSM6DSV16XStatusTypeDef Enable_6D_Orientation(LSM6DSV16X_SensorIntPin_t IntPin);
     LSM6DSV16XStatusTypeDef Disable_6D_Orientation();
@@ -212,6 +239,15 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef FIFO_Set_X_BDR(float Bdr);
     LSM6DSV16XStatusTypeDef FIFO_Get_G_Axes(int32_t *AngularVelocity);
     LSM6DSV16XStatusTypeDef FIFO_Set_G_BDR(float Bdr);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Status(lsm6dsv16x_fifo_status_t *Status);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Rotation_Vector(float *rvec);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Gravity_Vector(float *gvec);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Gyroscope_Bias(float *gbias);
+    LSM6DSV16XStatusTypeDef FIFO_Enable_Timestamp();
+    LSM6DSV16XStatusTypeDef FIFO_Disable_Timestamp();
+    LSM6DSV16XStatusTypeDef FIFO_Set_Timestamp_Decimation(uint8_t decimation);
+    LSM6DSV16XStatusTypeDef FIFO_Get_Timestamp(uint32_t *timestamp);
+    LSM6DSV16XStatusTypeDef FIFO_Reset();
 
     LSM6DSV16XStatusTypeDef QVAR_Enable();
     LSM6DSV16XStatusTypeDef QVAR_Disable();
@@ -229,13 +265,19 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Disable_Gravity_Vector();
     LSM6DSV16XStatusTypeDef Enable_Gyroscope_Bias();
     LSM6DSV16XStatusTypeDef Disable_Gyroscope_Bias();
-    LSM6DSV16XStatusTypeDef FIFO_Get_Rotation_Vector(float *rvec);
-    LSM6DSV16XStatusTypeDef FIFO_Get_Gravity_Vector(float *gvec);
-    LSM6DSV16XStatusTypeDef FIFO_Get_Gyroscope_Bias(float *gbias);
+    LSM6DSV16XStatusTypeDef Set_SFLP_Batch(bool GameRotation, bool Gravity, bool gBias);
+    LSM6DSV16XStatusTypeDef Set_SFLP_ODR(float Odr);
+    LSM6DSV16XStatusTypeDef Set_SFLP_GBIAS(float x, float y, float z);
     LSM6DSV16XStatusTypeDef Reset_SFLP();
 
     LSM6DSV16XStatusTypeDef Read_Reg(uint8_t Reg, uint8_t *Data);
     LSM6DSV16XStatusTypeDef Write_Reg(uint8_t Reg, uint8_t Data);
+
+    LSM6DSV16XStatusTypeDef Enable_Block_Data_Update();
+    LSM6DSV16XStatusTypeDef Disable_Block_Data_Update();
+    LSM6DSV16XStatusTypeDef Enable_Auto_Increment();
+    LSM6DSV16XStatusTypeDef Disable_Auto_Increment();
+    LSM6DSV16XStatusTypeDef Device_Reset(LSM6DSV16X_Reset_t flags = LSM6DSV16X_RESET_GLOBAL);
 
     /**
      * @brief Utility function to read data.
@@ -291,7 +333,7 @@ class LSM6DSV16XSensor {
      * @param  NumByteToWrite: number of bytes to write.
      * @retval 0 if ok, an error code otherwise.
      */
-    uint8_t IO_Write(uint8_t *pBuffer, uint8_t RegisterAddr, uint16_t NumByteToWrite)
+    uint8_t IO_Write(const uint8_t *pBuffer, uint8_t RegisterAddr, uint16_t NumByteToWrite)
     {
       if (dev_spi) {
         dev_spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
@@ -333,9 +375,14 @@ class LSM6DSV16XSensor {
     LSM6DSV16XStatusTypeDef Set_X_ODR_When_Disabled(float Odr);
     LSM6DSV16XStatusTypeDef Set_G_ODR_When_Enabled(float Odr);
     LSM6DSV16XStatusTypeDef Set_G_ODR_When_Disabled(float Odr);
+    LSM6DSV16XStatusTypeDef Get_X_AxesRaw_When_Aval(int16_t *Value);
+    LSM6DSV16XStatusTypeDef Get_G_AxesRaw_When_Aval(int16_t *Value);
     LSM6DSV16XStatusTypeDef npy_halfbits_to_floatbits(uint16_t h, uint32_t *f);
     LSM6DSV16XStatusTypeDef npy_half_to_float(uint16_t h, float *f);
     LSM6DSV16XStatusTypeDef sflp2q(float quat[4], uint16_t sflp[3]);
+
+    float Convert_X_Sensitivity(lsm6dsv16x_xl_full_scale_t full_scale);
+    float Convert_G_Sensitivity(lsm6dsv16x_gy_full_scale_t full_scale);
 
     /* Helper classes. */
     TwoWire *dev_i2c;
@@ -348,17 +395,21 @@ class LSM6DSV16XSensor {
 
     lsm6dsv16x_data_rate_t acc_odr;
     lsm6dsv16x_data_rate_t gyro_odr;
+    lsm6dsv16x_xl_full_scale_t acc_fs;
+    lsm6dsv16x_gy_full_scale_t gyro_fs;
+    lsm6dsv16x_fifo_mode_t fifo_mode;
     uint8_t acc_is_enabled;
     uint8_t gyro_is_enabled;
     uint8_t initialized;
-    lsm6dsv16x_ctx_t reg_ctx;
+    stmdev_ctx_t reg_ctx;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-int32_t LSM6DSV16X_io_write(void *handle, uint8_t WriteAddr, uint8_t *pBuffer, uint16_t nBytesToWrite);
+int32_t LSM6DSV16X_io_write(void *handle, uint8_t WriteAddr, const uint8_t *pBuffer, uint16_t nBytesToWrite);
 int32_t LSM6DSV16X_io_read(void *handle, uint8_t ReadAddr, uint8_t *pBuffer, uint16_t nBytesToRead);
+void LSM6DSV16X_sleep(uint32_t ms);
 #ifdef __cplusplus
 }
 #endif
