@@ -3478,7 +3478,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Test_X_IMU(uint8_t TestType)
 }
 
 /**
- * @brief  Get the LSM6DSV accelerometer sensor raw axes when available (Blocking)
+ * @brief  Get the LSM6DSV16X accelerometer sensor raw axes when available (Blocking)
  * @param  Value pointer where the raw values of the axes are written
  * @retval 0 in case of success, an error code otherwise
  */
@@ -3602,7 +3602,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Test_G_IMU(uint8_t TestType = LSM6DSV1
 }
 
 /**
- * @brief  Get the LSM6DSV gyroscope sensor raw axes when data available (Blocking)
+ * @brief  Get the LSM6DSV16X gyroscope sensor raw axes when data available (Blocking)
  * @param  Value pointer where the raw values of the axes are written
  * @retval 0 in case of success, an error code otherwise
  */
@@ -4161,7 +4161,7 @@ int32_t LSM6DSV16X_io_read(void *handle, uint8_t ReadAddr, uint8_t *pBuffer, uin
   return ((LSM6DSV16XSensor *)handle)->IO_Read(pBuffer, ReadAddr, nBytesToRead);
 }
 
-void LSM6DSV_sleep(uint32_t ms)
+void LSM6DSV16X_sleep(uint32_t ms)
 {
   delay(ms);
 }
