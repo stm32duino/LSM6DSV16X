@@ -243,7 +243,8 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_X_Sensitivity(float *Sensitivity)
  * @param  full_scale enum with type lsm6dsv16x_xl_full_scale_t to be converted
  * @retval sensitivity as float
  */
-float LSM6DSV16XSensor::Convert_X_Sensitivity(lsm6dsv16x_xl_full_scale_t full_scale) {
+float LSM6DSV16XSensor::Convert_X_Sensitivity(lsm6dsv16x_xl_full_scale_t full_scale)
+{
   float Sensitivity = 0.0f;
   /* Store the Sensitivity based on actual full scale. */
   switch (full_scale) {
@@ -825,9 +826,9 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_X_User_Offset(float x, float y, fl
   int8_t xyz[3];
 
   if ( // about +- 2 G's for high and +- 0.124 G's for low
-      (x <= LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX && x >= -LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX) &&
-      (y <= LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX && y >= -LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX) &&
-      (z <= LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX && z >= -LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX)) { // Then we are under the low requirements
+    (x <= LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX && x >= -LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX) &&
+    (y <= LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX && y >= -LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX) &&
+    (z <= LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX && z >= -LSM6DSV16X_ACC_USR_OFF_W_LOW_MAX)) { // Then we are under the low requirements
     xyz[0] = (int8_t)(x / LSM6DSV16X_ACC_USR_OFF_W_LOW_LSB);
     xyz[1] = (int8_t)(y / LSM6DSV16X_ACC_USR_OFF_W_LOW_LSB);
     xyz[2] = (int8_t)(z / LSM6DSV16X_ACC_USR_OFF_W_LOW_LSB);
@@ -835,15 +836,14 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_X_User_Offset(float x, float y, fl
   }
 
   else if ( // about +- 2 G's for high and +- 0.124 G's for low
-      (x <= LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX && x >= -LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX) &&
-      (y <= LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX && y >= -LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX) &&
-      (z <= LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX && z >= -LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX)) { // Then we are under the high requirements
+    (x <= LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX && x >= -LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX) &&
+    (y <= LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX && y >= -LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX) &&
+    (z <= LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX && z >= -LSM6DSV16X_ACC_USR_OFF_W_HIGH_MAX)) { // Then we are under the high requirements
     xyz[0] = (int8_t)(x / LSM6DSV16X_ACC_USR_OFF_W_HIGH_LSB);
     xyz[1] = (int8_t)(y / LSM6DSV16X_ACC_USR_OFF_W_HIGH_LSB);
     xyz[2] = (int8_t)(z / LSM6DSV16X_ACC_USR_OFF_W_HIGH_LSB);
     ctrl9.usr_off_w = true; //(0: 2^-10 g/LSB; 1: 2^-6 g/LSB)
-  }
-  else {
+  } else {
     return LSM6DSV16X_ERROR; // Value too big
   }
 
@@ -2555,7 +2555,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Set_Mode(uint8_t Mode)
       newMode = LSM6DSV16X_BYPASS_TO_FIFO_MODE;
       break;
     default:
-    return LSM6DSV16X_ERROR;
+      return LSM6DSV16X_ERROR;
   }
   fifo_mode = newMode;
   if (lsm6dsv16x_fifo_mode_set(&reg_ctx, fifo_mode) != LSM6DSV16X_OK) {
@@ -2795,7 +2795,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::FIFO_Disable_Timestamp()
 }
 
 /**
- * @brief  Set the decimation of timestamp for how often FIFO will be updated with timestamp value 
+ * @brief  Set the decimation of timestamp for how often FIFO will be updated with timestamp value
  * @param  decimation FIFO Timestamp Decimation
  * @retval 0 in case of success, an error code otherwise
  */
@@ -3288,20 +3288,20 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Get_Temp_ODR(float *Odr)
   }
 
   switch (ctrl4.odr_t_batch) {
-  case LSM6DSV16X_TEMP_NOT_BATCHED:
-    *Odr = 0;
-    break;
-  case LSM6DSV16X_TEMP_BATCHED_AT_1Hz875:
-    *Odr = 1.875f;
-    break;
-  case LSM6DSV16X_TEMP_BATCHED_AT_15Hz:
-    *Odr = 15;
-    break;
-  case LSM6DSV16X_TEMP_BATCHED_AT_60Hz:
-    *Odr = 60;
-    break;
-  default:
-    break;
+    case LSM6DSV16X_TEMP_NOT_BATCHED:
+      *Odr = 0;
+      break;
+    case LSM6DSV16X_TEMP_BATCHED_AT_1Hz875:
+      *Odr = 1.875f;
+      break;
+    case LSM6DSV16X_TEMP_BATCHED_AT_15Hz:
+      *Odr = 15;
+      break;
+    case LSM6DSV16X_TEMP_BATCHED_AT_60Hz:
+      *Odr = 60;
+      break;
+    default:
+      break;
   }
 
   return LSM6DSV16X_OK;
@@ -3322,22 +3322,19 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_Temp_ODR(float Odr)
 
   if (Odr == 0.0F) {
     ctrl4.odr_t_batch = LSM6DSV16X_TEMP_NOT_BATCHED;
-  }
-  else if (Odr <= 1.875F) {
+  } else if (Odr <= 1.875F) {
     ctrl4.odr_t_batch = LSM6DSV16X_TEMP_BATCHED_AT_1Hz875;
-  }
-  else if (Odr <= 15.0F) {
+  } else if (Odr <= 15.0F) {
     ctrl4.odr_t_batch = LSM6DSV16X_TEMP_BATCHED_AT_15Hz;
-  }
-  else {
+  } else {
     ctrl4.odr_t_batch = LSM6DSV16X_TEMP_BATCHED_AT_60Hz;
   }
 
   return (LSM6DSV16XStatusTypeDef)lsm6dsv16x_write_reg(
-      &reg_ctx,
-      LSM6DSV16X_FIFO_CTRL4,
-      (uint8_t *)&ctrl4,
-      1);
+           &reg_ctx,
+           LSM6DSV16X_FIFO_CTRL4,
+           (uint8_t *)&ctrl4,
+           1);
 }
 
 /**
@@ -3408,7 +3405,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Test_X_IMU(uint8_t TestType)
   if (lsm6dsv16x_xl_full_scale_set(&reg_ctx, LSM6DSV16X_4g) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
-  delay(100); // Wait for Accelerometer to stabalize;
+  delay(100); // Wait for Accelerometer to stabilize;
   memset(val_st_off, 0x00, 3 * sizeof(float));
   memset(val_st_on, 0x00, 3 * sizeof(float));
 
@@ -3465,8 +3462,9 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Test_X_IMU(uint8_t TestType)
   }
 
   for (uint8_t i = 0; i < 3; i++) {
-    if ((LSM6DSV16X_MIN_ST_LIMIT_mg > test_val[i]) || (test_val[i] > LSM6DSV16X_MAX_ST_LIMIT_mg))
+    if ((LSM6DSV16X_MIN_ST_LIMIT_mg > test_val[i]) || (test_val[i] > LSM6DSV16X_MAX_ST_LIMIT_mg)) {
       return LSM6DSV16X_ERROR;
+    }
   }
 
   if (lsm6dsv16x_xl_self_test_set(&reg_ctx, LSM6DSV16X_XL_ST_DISABLE) != LSM6DSV16X_OK) {
@@ -3480,7 +3478,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Test_X_IMU(uint8_t TestType)
 }
 
 /**
- * @brief  Get the LSM6DSV accelerometer sensor raw axes when avaiable (Blocking)
+ * @brief  Get the LSM6DSV accelerometer sensor raw axes when available (Blocking)
  * @param  Value pointer where the raw values of the axes are written
  * @retval 0 in case of success, an error code otherwise
  */
@@ -3993,8 +3991,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_SFLP_Batch(bool GameRotation, bool
     if (lsm6dsv16x_sflp_game_rotation_set(&reg_ctx, PROPERTY_DISABLE)) {
       return LSM6DSV16X_ERROR;
     }
-  }
-  else {
+  } else {
     /* Enable SFLP low power */
     if (lsm6dsv16x_sflp_game_rotation_set(&reg_ctx, PROPERTY_ENABLE)) {
       return LSM6DSV16X_ERROR;
@@ -4016,7 +4013,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Set_SFLP_ODR(float odr)
                                      : odr <= 60  ? LSM6DSV16X_SFLP_60Hz
                                      : odr <= 120 ? LSM6DSV16X_SFLP_120Hz
                                      : odr <= 240 ? LSM6DSV16X_SFLP_240Hz
-                                                  : LSM6DSV16X_SFLP_480Hz;
+                                     : LSM6DSV16X_SFLP_480Hz;
 
   return (LSM6DSV16XStatusTypeDef)lsm6dsv16x_sflp_data_rate_set(&reg_ctx, rate);
 }
@@ -4074,7 +4071,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Reset_SFLP(void)
  */
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Block_Data_Update()
 {
-    return (LSM6DSV16XStatusTypeDef)lsm6dsv16x_block_data_update_set(&reg_ctx, PROPERTY_ENABLE);
+  return (LSM6DSV16XStatusTypeDef)lsm6dsv16x_block_data_update_set(&reg_ctx, PROPERTY_ENABLE);
 }
 
 /**
@@ -4083,7 +4080,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Block_Data_Update()
  */
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Block_Data_Update()
 {
-    return (LSM6DSV16XStatusTypeDef)lsm6dsv16x_block_data_update_set(&reg_ctx, PROPERTY_DISABLE);
+  return (LSM6DSV16XStatusTypeDef)lsm6dsv16x_block_data_update_set(&reg_ctx, PROPERTY_DISABLE);
 }
 
 /**
@@ -4105,7 +4102,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Auto_Increment()
 }
 
 /**
- * @brief Preform a full reset of the LSM6DSV16X
+ * @brief Perform a full reset of the LSM6DSV16X
  * @param  flags lsm6dsv16x_reset_t flags for what to reset
  * @retval 0 in case of success, an error code otherwise
  */
@@ -4164,8 +4161,9 @@ int32_t LSM6DSV16X_io_read(void *handle, uint8_t ReadAddr, uint8_t *pBuffer, uin
   return ((LSM6DSV16XSensor *)handle)->IO_Read(pBuffer, ReadAddr, nBytesToRead);
 }
 
-void LSM6DSV_sleep(uint32_t ms) {
-    delay(ms);
+void LSM6DSV_sleep(uint32_t ms)
+{
+  delay(ms);
 }
 
 /**
