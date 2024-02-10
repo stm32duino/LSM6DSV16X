@@ -401,7 +401,7 @@ class LSM6DSV16XSensor {
     uint8_t acc_is_enabled;
     uint8_t gyro_is_enabled;
     uint8_t initialized;
-    stmdev_ctx_t reg_ctx;
+    lsm6dsv16x_ctx_t reg_ctx;
 };
 
 #ifdef __cplusplus
