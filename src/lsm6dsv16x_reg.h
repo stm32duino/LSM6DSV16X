@@ -102,6 +102,11 @@ typedef struct {
 
 #endif /* MEMS_SHARED_TYPES */
 
+/**
+  * @}
+  *
+  */
+
 #ifndef MEMS_UCF_SHARED_TYPES
 #define MEMS_UCF_SHARED_TYPES
 
@@ -128,12 +133,7 @@ typedef struct {
 
 #endif /* MEMS_UCF_SHARED_TYPES */
 
-/**
-  * @}
-  *
-  */
-
-/** @addtogroup  LSM6DSV16X_Interfaces_Functions
+/** @addtogroup  Interfaces_Functions
   * @brief       This section provide a set of functions used to read and
   *              write a generic register of the device.
   *              MANDATORY: return 0 -> no Error.
@@ -141,7 +141,7 @@ typedef struct {
   *
   */
 
-typedef int32_t (*lsm6dsv16x_write_ptr)(void *, uint8_t,  uint8_t *, uint16_t);
+typedef int32_t (*lsm6dsv16x_write_ptr)(void *, uint8_t, const uint8_t *, uint16_t);
 typedef int32_t (*lsm6dsv16x_read_ptr)(void *, uint8_t, uint8_t *, uint16_t);
 typedef void (*lsm6dsv16x_mdelay_ptr)(uint32_t millisec);
 
@@ -3644,6 +3644,8 @@ float_t lsm6dsv16x_from_lsb_to_celsius(int16_t lsb);
 
 float_t lsm6dsv16x_from_lsb_to_nsec(uint32_t lsb);
 
+float_t lsm6dsv16x_from_lsb_to_mv(int16_t lsb);
+
 int32_t lsm6dsv16x_xl_offset_on_out_set(lsm6dsv16x_ctx_t *ctx, uint8_t val);
 int32_t lsm6dsv16x_xl_offset_on_out_get(lsm6dsv16x_ctx_t *ctx, uint8_t *val);
 
@@ -3775,7 +3777,7 @@ typedef enum {
   LSM6DSV16X_500dps  = 0x2,
   LSM6DSV16X_1000dps = 0x3,
   LSM6DSV16X_2000dps = 0x4,
-  LSM6DSV16X_4000dps = 0x5,
+  LSM6DSV16X_4000dps = 0xc,
 } lsm6dsv16x_gy_full_scale_t;
 int32_t lsm6dsv16x_gy_full_scale_set(lsm6dsv16x_ctx_t *ctx,
                                      lsm6dsv16x_gy_full_scale_t val);

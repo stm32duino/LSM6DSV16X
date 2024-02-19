@@ -45,7 +45,7 @@ void setup()
   LSM6DSV16X.Enable_X();
 
   // Enable 6D Orientation.
-  LSM6DSV16XStatusTypeDef ret = LSM6DSV16X.Enable_6D_Orientation(LSM6DSV16X_INT1_PIN);
+  LSM6DSV16X.Enable_6D_Orientation(LSM6DSV16X_INT1_PIN);
 }
 
 void loop()

@@ -173,6 +173,11 @@ float_t lsm6dsv16x_from_lsb_to_nsec(uint32_t lsb)
   return ((float_t)lsb * 21750.0f);
 }
 
+float_t lsm6dsv16x_from_lsb_to_mv(int16_t lsb)
+{
+  return ((float_t)lsb) / 78.0f;
+}
+
 /**
   * @}
   *
@@ -2795,7 +2800,7 @@ int32_t lsm6dsv16x_den_conf_get(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_den_conf_t *va
   val->den_y = den.den_y;
   val->den_x = den.den_x;
 
-  if ((den.den_z | den.den_z | den.den_z) == PROPERTY_ENABLE) {
+  if ((den.den_x | den.den_y | den.den_z) == PROPERTY_ENABLE) {
     if (den.den_xl_g == PROPERTY_DISABLE && den.den_xl_en == PROPERTY_ENABLE) {
       val->stamp_in_gy_data = PROPERTY_ENABLE;
       val->stamp_in_xl_data = PROPERTY_ENABLE;
@@ -5418,8 +5423,8 @@ int32_t lsm6dsv16x_fsm_mode_set(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_fsm_mode_t val
     goto exit;
   }
 
-  if ((val.fsm1_en | val.fsm2_en | val.fsm1_en | val.fsm1_en
-       | val.fsm1_en | val.fsm2_en | val.fsm1_en | val.fsm1_en) == PROPERTY_ENABLE) {
+  if ((val.fsm1_en | val.fsm2_en | val.fsm3_en | val.fsm4_en
+       | val.fsm5_en | val.fsm6_en | val.fsm7_en | val.fsm8_en) == PROPERTY_ENABLE) {
     emb_func_en_b.fsm_en = PROPERTY_ENABLE;
   } else {
     emb_func_en_b.fsm_en = PROPERTY_DISABLE;
@@ -8584,7 +8589,7 @@ int32_t lsm6dsv16x_ui_sda_pull_up_get(lsm6dsv16x_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  SPI2 (OIS interface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[set]
+  * @brief  SPI2 (OIS Interface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[set]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      SPI2_4_WIRE, SPI2_3_WIRE,
@@ -8606,7 +8611,7 @@ int32_t lsm6dsv16x_spi2_mode_set(lsm6dsv16x_ctx_t *ctx, lsm6dsv16x_spi2_mode_t v
 }
 
 /**
-  * @brief  SPI2 (OIS interface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[get]
+  * @brief  SPI2 (OIS Interface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[get]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      SPI2_4_WIRE, SPI2_3_WIRE,
