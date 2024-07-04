@@ -55,8 +55,6 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(TwoWire *i2c, uint8_t address) : dev_i2c(i2c)
   dev_spi = NULL;
   acc_is_enabled = 0L;
   gyro_is_enabled = 0L;
-  acc_fs = LSM6DSV16X_2g;
-  gyro_fs = LSM6DSV16X_125dps;
 }
 
 /** Constructor
@@ -73,8 +71,6 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(SPIClass *spi, int cs_pin, uint32_t spi_speed
   dev_i2c = NULL;
   acc_is_enabled = 0L;
   gyro_is_enabled = 0L;
-  acc_fs = LSM6DSV16X_2g;
-  gyro_fs = LSM6DSV16X_125dps;
 }
 
 /**
@@ -83,6 +79,8 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(SPIClass *spi, int cs_pin, uint32_t spi_speed
  */
 LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin()
 {
+  int32_t fs = 0;
+
   if (dev_spi) {
     // Configure CS pin
     pinMode(cs_pin, OUTPUT);
@@ -113,6 +111,16 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin()
     return LSM6DSV16X_ERROR;
   }
 
+  /* Set accelerometer full scale internal variable */
+  if (Get_X_FS(&fs) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  acc_fs = (fs <= 2) ? LSM6DSV16X_2g
+           : (fs <= 4) ? LSM6DSV16X_4g
+           : (fs <= 8) ? LSM6DSV16X_8g
+           :                    LSM6DSV16X_16g;
+
   /* Full scale selection. */
   if (lsm6dsv16x_xl_full_scale_set(&reg_ctx, LSM6DSV16X_2g) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
@@ -125,6 +133,18 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin()
   if (lsm6dsv16x_gy_data_rate_set(&reg_ctx, LSM6DSV16X_ODR_OFF) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
+
+  /* Set gyroscope full scale internal variable */
+  if (Get_G_FS(&fs) != LSM6DSV16X_OK) {
+    return LSM6DSV16X_ERROR;
+  }
+
+  gyro_fs = (fs <= 125)  ? LSM6DSV16X_125dps
+            : (fs <= 250)  ? LSM6DSV16X_250dps
+            : (fs <= 500)  ? LSM6DSV16X_500dps
+            : (fs <= 1000) ? LSM6DSV16X_1000dps
+            : (fs <= 2000) ? LSM6DSV16X_2000dps
+            :                       LSM6DSV16X_4000dps;
 
   /* Full scale selection. */
   if (lsm6dsv16x_gy_full_scale_set(&reg_ctx, LSM6DSV16X_2000dps) != LSM6DSV16X_OK) {
