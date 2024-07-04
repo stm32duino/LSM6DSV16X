@@ -122,7 +122,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin()
            :                    LSM6DSV16X_16g;
 
   /* Full scale selection. */
-  if (lsm6dsv16x_xl_full_scale_set(&reg_ctx, LSM6DSV16X_2g) != LSM6DSV16X_OK) {
+  if (Set_X_FS(2) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
 
@@ -147,7 +147,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin()
             :                       LSM6DSV16X_4000dps;
 
   /* Full scale selection. */
-  if (lsm6dsv16x_gy_full_scale_set(&reg_ctx, LSM6DSV16X_2000dps) != LSM6DSV16X_OK) {
+  if (Set_G_FS(2000) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
 
