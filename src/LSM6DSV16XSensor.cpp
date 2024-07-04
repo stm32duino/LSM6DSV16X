@@ -55,6 +55,8 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(TwoWire *i2c, uint8_t address) : dev_i2c(i2c)
   dev_spi = NULL;
   acc_is_enabled = 0L;
   gyro_is_enabled = 0L;
+  acc_fs = LSM6DSV16X_2g;
+  gyro_fs = LSM6DSV16X_125dps;
 }
 
 /** Constructor
@@ -71,6 +73,8 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(SPIClass *spi, int cs_pin, uint32_t spi_speed
   dev_i2c = NULL;
   acc_is_enabled = 0L;
   gyro_is_enabled = 0L;
+  acc_fs = LSM6DSV16X_2g;
+  gyro_fs = LSM6DSV16X_125dps;
 }
 
 /**
