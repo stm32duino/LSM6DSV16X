@@ -3619,7 +3619,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Test_G_IMU(uint8_t TestType = LSM6DSV1
     return LSM6DSV16X_ERROR;
   }
 
-  if (lsm6dsv16x_xl_data_rate_set(&reg_ctx, LSM6DSV16X_ODR_OFF) != LSM6DSV16X_OK) {
+  if (lsm6dsv16x_gy_data_rate_set(&reg_ctx, LSM6DSV16X_ODR_OFF) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
   return LSM6DSV16X_OK;
