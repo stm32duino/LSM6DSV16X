@@ -1,5 +1,5 @@
 /*
-   @file    LSM6DSV16X_Qvar_Polling_I2C.ino
+   @file    LSM6DSV16X_Qvar.ino
    @author  STMicroelectronics
    @brief   Example to use LSM6DSV16X Qvar features
  *******************************************************************************

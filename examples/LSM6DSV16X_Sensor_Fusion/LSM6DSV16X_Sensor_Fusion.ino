@@ -1,5 +1,5 @@
 /*
-   @file    LSM6DSV16X_Sensor_Fusion_I2C.ino
+   @file    LSM6DSV16X_Sensor_Fusion.ino
    @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X library with Sensor Fusion Low Power.
  *******************************************************************************

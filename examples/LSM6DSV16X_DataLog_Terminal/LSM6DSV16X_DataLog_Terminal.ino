@@ -1,9 +1,9 @@
 /*
-   @file    LSM6DSV16X_DataLog_Terminal_I2C.ino
+   @file    LSM6DSV16X_DataLog_Terminal.ino
    @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X inertial measurement sensor
  *******************************************************************************
-   Copyright (c) 2026, STMicroelectronics
+   Copyright (c) 2022, STMicroelectronics
    All rights reserved.
    This software component is licensed by ST under BSD 3-Clause license,
    the "License"; You may not use this file except in compliance with the

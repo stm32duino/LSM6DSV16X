@@ -1,5 +1,5 @@
 /*
-   @file    LSM6DSV16X_Free_Fall_Detection_I2C.ino
+   @file    LSM6DSV16X_Free_Fall_Detection.ino
    @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X Free Fall Detection
  *******************************************************************************

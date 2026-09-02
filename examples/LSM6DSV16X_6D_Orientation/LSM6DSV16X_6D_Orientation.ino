@@ -1,5 +1,5 @@
 /*
-   @file    LSM6DSV16X_6D_Orientation_I2C.ino
+   @file    LSM6DSV16X_HelloWorld.ino
    @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X 6D Orientation
  *******************************************************************************

@@ -1,7 +1,7 @@
 /*
-   @file    LSM6DSV16X_Pedometer_I2C.ino
+   @file    LSM6DSV16X_Double_Tap_Detection.ino
    @author  STMicroelectronics
-   @brief   Example to use the LSM6DSV16X Pedometer
+   @brief   Example to use the LSM6DSV16X Double Tap Detection
  *******************************************************************************
    Copyright (c) 2022, STMicroelectronics
    All rights reserved.
@@ -19,12 +19,7 @@ LSM6DSV16XSensor LSM6DSV16X(&Wire);
 
 //Interrupts.
 volatile int mems_event = 0;
-uint16_t step_count = 0;
-uint32_t previous_tick;
-char report[256];
-
 void INT1Event_cb();
-
 
 void setup()
 {
@@ -46,10 +41,8 @@ void setup()
   LSM6DSV16X.begin();
   LSM6DSV16X.Enable_X();
 
-  // Enable Pedometer.
-  LSM6DSV16X.Enable_Pedometer(LSM6DSV16X_INT1_PIN);
-
-  previous_tick = millis();
+  // Enable Double Tap Detection.
+  LSM6DSV16X.Enable_Double_Tap_Detection(LSM6DSV16X_INT1_PIN);
 }
 
 void loop()
@@ -59,26 +52,14 @@ void loop()
     LSM6DSV16X_Event_Status_t status;
     LSM6DSV16X.Get_X_Event_Status(&status);
 
-    if (status.StepStatus) {
+    if (status.DoubleTapStatus) {
       // Led blinking.
       digitalWrite(LED_BUILTIN, HIGH);
       delay(100);
       digitalWrite(LED_BUILTIN, LOW);
-
-      LSM6DSV16X.Get_Step_Count(&step_count);
-      snprintf(report, sizeof(report), "Step counter: %d", step_count);
-      Serial.println(report);
+      Serial.println("Double Tap Detected!");
     }
   }
-  // Print the step counter in any case every 3000 ms
-  uint32_t current_tick = millis();
-  if ((current_tick - previous_tick) >= 3000) {
-    LSM6DSV16X.Get_Step_Count(&step_count);
-    snprintf(report, sizeof(report), "Step counter: %d", step_count);
-    Serial.println(report);
-    previous_tick = millis();
-  }
-
 }
 
 void INT1Event_cb()

@@ -2,13 +2,13 @@
  ******************************************************************************
  * @file    LSM6DSV16XSensor.h
  * @author  STMicroelectronics
- * @version V2.1.0
- * @date    September 2026
+ * @version V1.0.0
+ * @date    July 2022
  * @brief   Abstract Class of a LSM6DSV16X inertial measurement sensor.
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; COPYRIGHT(c) 2026 STMicroelectronics</center></h2>
+ * <h2><center>&copy; COPYRIGHT(c) 2022 STMicroelectronics</center></h2>
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -48,11 +48,6 @@
 #include "SPI.h"
 #include "lsm6dsv16x_reg.h"
 
-#if (defined(I3C1_BASE) || defined(I3C2_BASE)) && !defined(I3C_SUPPORTED)
-  #define I3C_SUPPORTED
-  #include "I3C.h"
-#endif
-
 
 /* Defines -------------------------------------------------------------------*/
 /* For compatibility with ESP32 platforms */
@@ -60,19 +55,6 @@
   #ifndef MSBFIRST
     #define MSBFIRST SPI_MSBFIRST
   #endif
-#endif
-
-#define LSM6DSV16X_I2C_BUS                     0U
-#define LSM6DSV16X_SPI_4WIRES_BUS              1U
-#define LSM6DSV16X_SPI_3WIRES_BUS              2U
-#define LSM6DSV16X_I3C_BUS                     3U
-
-#if defined(I3C_SUPPORTED)
-  #define LSM6DSV16X_I3C_ADD_L                 0x6AU
-  #define LSM6DSV16X_I3C_ADD_H                 0x6BU
-
-  static const uint64_t LSM6DSV16X_I3C_PID_L = 0x02080070120BULL;
-  static const uint64_t LSM6DSV16X_I3C_PID_H = 0x02080070920BULL;
 #endif
 
 #define LSM6DSV16X_ACC_SENSITIVITY_FS_2G   0.061f
@@ -164,18 +146,10 @@ class LSM6DSV16XSensor {
   public:
     LSM6DSV16XSensor(TwoWire *i2c, uint8_t address = LSM6DSV16X_I2C_ADD_H);
     LSM6DSV16XSensor(SPIClass *spi, int cs_pin, uint32_t spi_speed = 2000000);
-#if defined(I3C_SUPPORTED)
-    LSM6DSV16XSensor(I3CBus *i3c, uint8_t static_addr7 = 0);
-#endif
 
-    LSM6DSV16XStatusTypeDef begin(uint8_t new_address = 0);
+    LSM6DSV16XStatusTypeDef begin();
     LSM6DSV16XStatusTypeDef end();
     LSM6DSV16XStatusTypeDef ReadID(uint8_t *Id);
-
-#if defined(I3C_SUPPORTED)
-    uint8_t getStaticAddress() const;
-    uint8_t getDynAddress() const;
-#endif
 
     LSM6DSV16XStatusTypeDef Enable_X();
     LSM6DSV16XStatusTypeDef Disable_X();
@@ -349,14 +323,6 @@ class LSM6DSV16XSensor {
         return 0;
       }
 
-#if defined(I3C_SUPPORTED)
-      if (dev_i3c) {
-        if (dev_i3c->readRegBuffer(address, RegisterAddr, pBuffer, NumByteToRead) == 0) {
-          return 0;
-        }
-      }
-#endif
-
       return 1;
     }
 
@@ -401,14 +367,6 @@ class LSM6DSV16XSensor {
         return 0;
       }
 
-#if defined(I3C_SUPPORTED)
-      if (dev_i3c) {
-        if (dev_i3c->writeRegBuffer(address, RegisterAddr, (uint8_t *)pBuffer, NumByteToWrite) == 0) {
-          return 0;
-        }
-      }
-#endif
-
       return 1;
     }
 
@@ -429,21 +387,11 @@ class LSM6DSV16XSensor {
     /* Helper classes. */
     TwoWire *dev_i2c;
     SPIClass *dev_spi;
-#if defined(I3C_SUPPORTED)
-    I3CBus *dev_i3c;
-#endif
-
-    uint32_t bus_type; /*0 means I2C, 1 means SPI 4-Wires, 2 means SPI-3-Wires, 3 means I3C */
 
     /* Configuration */
     uint8_t address;
     int cs_pin;
     uint32_t spi_speed;
-
-#if defined(I3C_SUPPORTED)
-    uint8_t i3c_static7;
-    uint8_t i3c_dyn7;
-#endif
 
     lsm6dsv16x_data_rate_t acc_odr;
     lsm6dsv16x_data_rate_t gyro_odr;

@@ -2,13 +2,13 @@
  ******************************************************************************
  * @file    LSM6DSV16XSensor.cpp
  * @author  STMicroelectronics
- * @version V2.1.0
- * @date    September 2026
+ * @version V1.0.0
+ * @date    July 2022
  * @brief   Implementation of a LSM6DSV16X inertial measurement sensor.
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; COPYRIGHT(c) 2026 STMicroelectronics</center></h2>
+ * <h2><center>&copy; COPYRIGHT(c) 2022 STMicroelectronics</center></h2>
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -53,13 +53,8 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(TwoWire *i2c, uint8_t address) : dev_i2c(i2c)
   reg_ctx.mdelay = LSM6DSV16X_sleep;
   reg_ctx.handle = (void *)this;
   dev_spi = NULL;
-#if defined(I3C_SUPPORTED)
-  dev_i3c = NULL;
-#endif
-  bus_type = LSM6DSV16X_I2C_BUS;
   acc_is_enabled = 0L;
   gyro_is_enabled = 0L;
-  initialized = 0U;
 }
 
 /** Constructor
@@ -74,77 +69,23 @@ LSM6DSV16XSensor::LSM6DSV16XSensor(SPIClass *spi, int cs_pin, uint32_t spi_speed
   reg_ctx.mdelay = LSM6DSV16X_sleep;
   reg_ctx.handle = (void *)this;
   dev_i2c = NULL;
-#if defined(I3C_SUPPORTED)
-  dev_i3c = NULL;
-#endif
-  bus_type = LSM6DSV16X_SPI_4WIRES_BUS;
-  address = 0U;
   acc_is_enabled = 0L;
   gyro_is_enabled = 0L;
-  initialized = 0U;
 }
-
-#if defined(I3C_SUPPORTED)
-LSM6DSV16XSensor::LSM6DSV16XSensor(I3CBus *i3c, uint8_t static_addr7)
-{
-  reg_ctx.write_reg = LSM6DSV16X_io_write;
-  reg_ctx.read_reg = LSM6DSV16X_io_read;
-  reg_ctx.mdelay = LSM6DSV16X_sleep;
-  reg_ctx.handle = (void *)this;
-
-  dev_i2c = NULL;
-  dev_spi = NULL;
-  dev_i3c = i3c;
-
-  address = static_addr7;
-  i3c_static7 = static_addr7;
-  i3c_dyn7 = 0;
-
-  bus_type = LSM6DSV16X_I3C_BUS;
-  acc_is_enabled = 0L;
-  gyro_is_enabled = 0L;
-  initialized = 0U;
-}
-
-uint8_t LSM6DSV16XSensor::getStaticAddress() const
-{
-  return i3c_static7;
-}
-
-uint8_t LSM6DSV16XSensor::getDynAddress() const
-{
-  return i3c_dyn7;
-}
-#endif
 
 /**
  * @brief  Initialize the LSM6DSV16X sensor
  * @retval 0 in case of success, an error code otherwise
  */
-LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin(uint8_t new_address)
+LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::begin()
 {
   int32_t fs = 0;
-  uint8_t id = 0;
 
   if (dev_spi) {
     // Configure CS pin
     pinMode(cs_pin, OUTPUT);
     digitalWrite(cs_pin, HIGH);
   }
-#if defined(I3C_SUPPORTED)
-  if (dev_i3c != nullptr) {
-    if (new_address < 0x08 || new_address > 0x77) {
-      return LSM6DSV16X_ERROR;
-    } else {
-      address = new_address;
-      i3c_dyn7 = new_address;
-    }
-    uint8_t id = 0;
-    if (ReadID(&id) != LSM6DSV16X_OK || id != LSM6DSV16X_ID) {
-      return LSM6DSV16X_ERROR;
-    }
-  }
-#endif
 
   /* Enable register address automatically incremented during a multiple byte
   access with a serial interface. */
@@ -1433,7 +1374,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Enable_Wake_Up_Detection(LSM6DSV16X_Se
     return LSM6DSV16X_ERROR;
   }
 
-  /* Set wake-up duration */
+  /* Set wake-up durantion */
   if (Set_Wake_Up_Duration(0) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }
@@ -1528,7 +1469,7 @@ LSM6DSV16XStatusTypeDef LSM6DSV16XSensor::Disable_Wake_Up_Detection()
     return LSM6DSV16X_ERROR;
   }
 
-  /* Reset wake-up duration */
+  /* Reset wake-up durantion */
   if (Set_Wake_Up_Duration(0) != LSM6DSV16X_OK) {
     return LSM6DSV16X_ERROR;
   }

@@ -1,7 +1,7 @@
 /*
-   @file    LSM6DSV16X_Single_Tap_Detection_I2C.ino
+   @file    LSM6DSV16X_Wake_Up_Detection.ino
    @author  STMicroelectronics
-   @brief   Example to use the LSM6DSV16X Single Tap Detection
+   @brief   Example to use the LSM6DSV16X Wake Up Detection
  *******************************************************************************
    Copyright (c) 2022, STMicroelectronics
    All rights reserved.
@@ -11,11 +11,14 @@
                           opensource.org/licenses/BSD-3-Clause
  *******************************************************************************
 */
+
+
 #include <LSM6DSV16XSensor.h>
 
 #define INT1_pin PA4
 
 LSM6DSV16XSensor LSM6DSV16X(&Wire);
+
 //Interrupts.
 volatile int mems_event = 0;
 
@@ -23,20 +26,26 @@ void INT1Event_cb();
 
 void setup()
 {
+
+  // Initlialize serial.
   Serial.begin(115200);
   delay(1000);
+
+  // Initlialize Led.
   pinMode(LED_BUILTIN, OUTPUT);
+
+  // Initlialize i2c.
   Wire.begin();
 
-  //Interrupts.
+  // Enable INT1 pin.
   attachInterrupt(INT1_pin, INT1Event_cb, RISING);
 
   // Initlialize components.
   LSM6DSV16X.begin();
   LSM6DSV16X.Enable_X();
 
-  // Enable Single Tap Detection.
-  LSM6DSV16X.Enable_Single_Tap_Detection(LSM6DSV16X_INT1_PIN);
+  // Enable Wake Up Detection.
+  LSM6DSV16X.Enable_Wake_Up_Detection(LSM6DSV16X_INT1_PIN);
 }
 
 void loop()
@@ -45,13 +54,13 @@ void loop()
     mems_event = 0;
     LSM6DSV16X_Event_Status_t status;
     LSM6DSV16X.Get_X_Event_Status(&status);
-    if (status.TapStatus) {
-
+    if (status.WakeUpStatus) {
       // Led blinking.
       digitalWrite(LED_BUILTIN, HIGH);
       delay(100);
       digitalWrite(LED_BUILTIN, LOW);
-      Serial.println("Single Tap Detected!");
+
+      Serial.println("Wake up Detected!");
     }
   }
 }

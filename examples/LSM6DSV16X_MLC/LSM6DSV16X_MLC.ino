@@ -1,5 +1,5 @@
 /*
-   @file    LSM6DSV16X_MLC_I2C.ino
+   @file    LSM6DSV16X_MLC.ino
    @author  STMicroelectronics
    @brief   Example to use the LSM6DSV16X Machine Learning Core
  *******************************************************************************
