@@ -34,6 +34,7 @@ An instance can be created and enabled when the SPI bus is used following the pr
 
 
 An instance can be created and enabled when the I3C bus is used with SETDASA (static-to-dynamic address assignment):  
+
     LSM6DSV16XSensor AccGyr(&I3C, LSM6DSV16X_I3C_ADD_H);
     I3C.resetDynamicAddresses();
     I3C.assignDynamicAddress(AccGyr.getStaticAddress(), LSM6DSV16X_DYNAMIC_ADDRESS);
